@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919592828089",
+    "project_id": "accesshire-2026",
+    "storage_bucket": "accesshire-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919592828089:android:727a9fc8b4172cdf16af68",
+        "android_client_info": {
+          "package_name": "com.gustann.accesshire"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5HSTXA1M4Zd9CzbnbcvEOZPRruLpRqLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
