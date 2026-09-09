@@ -1,24 +1,27 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { NavigationIndependentTree } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import Home from '../screens/Home';
+import LoginUser from '../UserTelas/loginUser';
+import CadastroUser from '../UserTelas/cadastroUser';
+import LoginEmp from '../EmpTelas/LoginEmp';
+import CadastroEmp from '../EmpTelas/CadastroEmp';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+const Stack = createNativeStackNavigator();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <NavigationIndependentTree>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="LoginUser" component={LoginUser} />
+          <Stack.Screen name="CadastroUser" component={CadastroUser} />
+          <Stack.Screen name="LoginEmp" component={LoginEmp} />
+          <Stack.Screen name="CadastroEmp" component={CadastroEmp} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NavigationIndependentTree>
   );
 }
