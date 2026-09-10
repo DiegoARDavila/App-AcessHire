@@ -49,7 +49,7 @@ export default function Login({ navigation }) {
             accessibilityLabel="Voltar"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             onPress={() => navigation.navigate('Home')}>
-            ><Text style={styles.backArrow}>←</Text>
+            <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
 
           <View style={styles.header}>
