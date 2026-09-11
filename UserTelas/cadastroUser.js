@@ -16,14 +16,14 @@ import {
 } from 'react-native';
 import { signUp } from '../services/auth';
 
-export default function Login({ navigation }) {
+export default function CadastroUser({ navigation }) {
   const { width, height } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [nome, setNome] = useState('');
+  const [cnpj, setCNPJ] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [cadastroConcluido, setCadastroConcluido] = useState(false);
 
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -34,8 +34,8 @@ export default function Login({ navigation }) {
   async function handleCadastro() {
     setError('');
 
-    if (!nome || !email || !senha) {
-      setError('Preenche nome, email e senha.');
+    if (!nome || !email || !senha || !cnpj) {
+      setError('Preenche todos os campos.');
       return;
     }
 
@@ -44,14 +44,14 @@ export default function Login({ navigation }) {
       await signUp({
         email,
         password: senha,
-        role: 'candidate',
+        role: 'company',
         profileData: {
-          nome,
-          verificationStatus: 'pending',
+          nomeEmpresa: nome,
+          cnpj,
         },
       });
 
-      setCadastroConcluido(true);
+      navigation.navigate('LoginEmp');
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('Esse email já está cadastrado.');
@@ -64,26 +64,6 @@ export default function Login({ navigation }) {
     } finally {
       setLoading(false);
     }
-  }
-
-  if (cadastroConcluido) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.form}>
-          <Text style={styles.subtitleText}>Cadastro realizado!</Text>
-          <Text style={{ textAlign: 'center', marginTop: 20, paddingHorizontal: 20, color: '#4a4a4a' }}>
-            Pra liberar sua conta, envie seu laudo médico para{' '}
-            <Text style={{ fontWeight: 'bold' }}>verificacao@accesshire.com</Text>{'\n\n'}
-            Você já pode navegar pelas vagas, mas só poderá se candidatar depois da verificação.
-          </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { marginTop: 30 }]}
-            onPress={() => navigation.navigate('Home')}>
-            <Text style={styles.loginButtonText}>Ir para o início</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
   }
 
   return (
@@ -116,19 +96,19 @@ export default function Login({ navigation }) {
                 <Text style={styles.brandAccent}>Access</Text>
                 <Text style={styles.brandDark}>Hire</Text>
               </Text>
-              <Text style={styles.subtitleText}>Cadastro De Usuários</Text>
+              <Text style={styles.subtitleText}>Cadastro De Empresas</Text>
             </View>
           </View>
 
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Nome Completo"
+              placeholder="Nome da Empresa"
               placeholderTextColor="#9b9b9b"
               value={nome}
               onChangeText={setNome}
               autoCapitalize="none"
-              accessibilityLabel="Campo de nome completo"
+              accessibilityLabel="Campo de nome da empresa"
             />
             <TextInput
               style={styles.input}
@@ -140,6 +120,15 @@ export default function Login({ navigation }) {
               keyboardType="email-address"
               autoCorrect={false}
               accessibilityLabel="Campo de email"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="CNPJ"
+              placeholderTextColor="#9b9b9b"
+              value={cnpj}
+              onChangeText={setCNPJ}
+              autoCapitalize="none"
+              accessibilityLabel="Campo de CNPJ"
             />
             <TextInput
               style={styles.input}
@@ -170,7 +159,9 @@ export default function Login({ navigation }) {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText} onPress={() => navigation.navigate('LoginUser')}>
+            <Text
+              style={styles.footerText}
+              onPress={() => navigation.navigate('LoginEmp')}>
               Já possui uma conta?{' '}
               <Text style={styles.footerLink}>Faça o login aqui!</Text>
             </Text>

@@ -12,25 +12,52 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-
-type LoginUsuarioScreenProps = {
-  onBack?: () => void;
-  onLogin?: (email: string, senha: string) => void;
-  onGoToCadastro?: () => void;
-  onGoToEmpresaLogin?: () => void;
-};
+import { signIn, getUserRole } from '../services/auth';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
   const scale = Math.min(Math.max(width / 320, 0.85), isTablet ? 1.6 : 1.25);
 
   const styles = createStyles(scale, isSmallDevice, isTablet, height);
+
+  async function handleLogin() {
+    setError('');
+
+    if (!email || !senha) {
+      setError('Preenche email e senha.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const uid = await signIn({ email, password: senha });
+      const role = await getUserRole(uid);
+
+      if (role === 'company') {
+        navigation.navigate('MenuEmp');
+      } else {
+        setError('Essa conta não é de empresa. Tenta o login de usuário.');
+      }
+    } catch (e) {
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+        setError('Email ou senha inválidos.');
+      } else {
+        setError('Erro ao entrar. Tenta de novo.');
+        console.log(e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -43,14 +70,14 @@ export default function Login({ navigation }) {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-            <TouchableOpacity
-              style={styles.backButton}
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              onPress={() => navigation.navigate('Home')}>
-              <Text style={styles.backArrow}>←</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.backArrow}>←</Text>
+          </TouchableOpacity>
 
           <View style={styles.header}>
             <Image
@@ -91,14 +118,21 @@ export default function Login({ navigation }) {
               accessibilityLabel="Campo de senha"
             />
 
+            {error ? <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text> : null}
+
             <TouchableOpacity
               style={styles.loginButton}
               activeOpacity={0.8}
-              onPress={() => onLogin?.(email, senha)}
+              onPress={handleLogin}
+              disabled={loading}
               accessibilityRole="button"
               accessibilityLabel="Fazer login"
             >
-              <Text style={styles.loginButtonText}>Login</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.loginButtonText}>Login</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -126,19 +160,10 @@ export default function Login({ navigation }) {
   );
 }
 
-function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean,
-  screenHeight: number
-) {
+function createStyles(scale, isSmallDevice, isTablet, screenHeight) {
   const maxContentWidth = isTablet ? 480 : '100%';
-
   return StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: '#ffffff',
-    },
+    safeArea: { flex: 1, backgroundColor: '#ffffff' },
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: isSmallDevice ? 20 : 32,
@@ -147,50 +172,16 @@ function createStyles(
       width: '100%',
       alignSelf: 'center',
     },
-    backButton: {
-      width: '100%',
-      justifyContent: 'center',
-      marginTop: 30,
-    },
-    backArrow: {
-      fontSize: 40 * scale,
-      color: '#4a4a4a',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 20 * scale,
-      justifyContent: 'center',
-    },
-    logo: {
-      width: 70 * scale,
-      height: 70 * scale,
-      borderRadius: 16 * scale,
-      backgroundColor: '#54c3ea',
-    },
-    headerTextBlock: {
-      marginLeft: 14 * scale,
-    },
-    brandText: {
-      fontSize: 30 * scale,
-      fontWeight: '800',
-    },
-    brandAccent: {
-      color: '#45c5f3',
-    },
-    brandDark: {
-      color: '#7c7c7c',
-    },
-    subtitleText: {
-      marginTop: 2,
-      fontSize: 15 * scale,
-      fontWeight: '700',
-      color: '#6f6f6f',
-    },
-    form: {
-      marginTop: screenHeight * 0.1,
-      alignItems: 'center',
-    },
+    backButton: { width: '100%', justifyContent: 'center', marginTop: 30 },
+    backArrow: { fontSize: 40 * scale, color: '#4a4a4a' },
+    header: { flexDirection: 'row', alignItems: 'center', marginTop: 20 * scale, justifyContent: 'center' },
+    logo: { width: 70 * scale, height: 70 * scale, borderRadius: 16 * scale, backgroundColor: '#54c3ea' },
+    headerTextBlock: { marginLeft: 14 * scale },
+    brandText: { fontSize: 30 * scale, fontWeight: '800' },
+    brandAccent: { color: '#45c5f3' },
+    brandDark: { color: '#7c7c7c' },
+    subtitleText: { marginTop: 2, fontSize: 15 * scale, fontWeight: '700', color: '#6f6f6f' },
+    form: { marginTop: screenHeight * 0.1, alignItems: 'center' },
     input: {
       width: '80%',
       borderWidth: 1,
@@ -212,26 +203,9 @@ function createStyles(
       marginTop: 30 * scale,
       width: '60%',
     },
-    loginButtonText: {
-      color: '#ffffff',
-      fontSize: 16 * scale,
-      fontWeight: '700',
-    },
-    footer: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      paddingVertical: 40 * scale,
-      gap: 10,
-    },
-    footerText: {
-      fontSize: 13 * scale,
-      color: '#6f6f6f',
-      textAlign: 'center',
-    },
-    footerLink: {
-      color: '#45c5f3',
-      fontWeight: '700',
-    },
+    loginButtonText: { color: '#ffffff', fontSize: 16 * scale, fontWeight: '700' },
+    footer: { flex: 1, justifyContent: 'flex-end', alignItems: 'center', paddingVertical: 40 * scale, gap: 10 },
+    footerText: { fontSize: 13 * scale, color: '#6f6f6f', textAlign: 'center' },
+    footerLink: { color: '#45c5f3', fontWeight: '700' },
   });
 }

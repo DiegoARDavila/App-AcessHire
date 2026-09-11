@@ -44,7 +44,7 @@ export default function Login({ navigation }) {
 
       if (role === 'candidate') {
         console.log('Login OK, papel: candidate. Navegar pra MenuUser quando a tela existir.');
-        // navigation.navigate('MenuUser'); // descomenta quando a tela estiver registrada
+        navigation.navigate('MenuUser');
       } else {
         setError('Essa conta não é de candidato. Tenta o login de empresa.');
       }
