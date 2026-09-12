@@ -9,16 +9,14 @@ import LoginEmp from '../EmpTelas/LoginEmp';
 import CadastroEmp from '../EmpTelas/CadastroEmp';
 import MenuEmp from '../EmpTelas/MenuEmp';
 import MenuUser from '../UserTelas/MenuUser';
-import Notificacoes from '../screens/Notificacoes';
-import PerfilUser from '../UserTelas/PerfilUser';
-import VagasUser from '../UserTelas/VagasUser';
-import Chat from '../screens/Chat';
 import ConfigUser from '../UserTelas/ConfigUser';
 import ConfigEmp from '../EmpTelas/ConfigEmp';
 import SegurancaUser from '../UserTelas/SegurancaUser';
 import Dados from '../screens/Dados';
 import Acessibilidade from '../screens/Acessibilidade';
 import SobreNos from '../screens/SobreNos';
+import OnboardingUser from '../UserTelas/OnboardingUser';
+import OnboardingEmp from '../EmpTelas/OnboardingEmp';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,10 +38,8 @@ export default function RootLayout() {
           <Stack.Screen name="Dados" component={Dados} />
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />
           <Stack.Screen name="SobreNos" component={SobreNos} />
-          <Stack.Screen name="Notificacoes" component={Notificacoes}/>
-          <Stack.Screen name="PerfilUser" component={PerfilUser} />
-          <Stack.Screen name="VagasUser" component={VagasUser} />
-          <Stack.Screen name="Chat" component={Chat} />
+          <Stack.Screen name="OnboardingUser" component={OnboardingUser} />
+          <Stack.Screen name="OnboardingEmp" component={OnboardingEmp} />
         </Stack.Navigator>
       </NavigationContainer>
     </NavigationIndependentTree>

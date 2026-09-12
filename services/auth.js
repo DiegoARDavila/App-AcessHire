@@ -49,3 +49,14 @@ export async function getUserRole(uid) {
   const docSnap = await getDoc(doc(db, 'users', uid));
   return docSnap.exists() ? docSnap.data().role : null;
 }
+
+export async function completeProfile(uid, role, data) {
+  const collectionName = role === 'candidate' ? 'candidates' : 'companies';
+  await setDoc(doc(db, collectionName, uid), { ...data, profileCompleted: true }, { merge: true });
+}
+
+export async function getProfile(uid, role) {
+  const collectionName = role === 'candidate' ? 'candidates' : 'companies';
+  const docSnap = await getDoc(doc(db, collectionName, uid));
+  return docSnap.exists() ? docSnap.data() : null;
+}

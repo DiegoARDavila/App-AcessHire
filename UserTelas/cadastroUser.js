@@ -16,14 +16,14 @@ import {
 } from 'react-native';
 import { signUp } from '../services/auth';
 
-export default function CadastroUser({ navigation }) {
+export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [nome, setNome] = useState('');
-  const [cnpj, setCNPJ] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cadastroConcluido, setCadastroConcluido] = useState(false);
 
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -34,24 +34,30 @@ export default function CadastroUser({ navigation }) {
   async function handleCadastro() {
     setError('');
 
-    if (!nome || !email || !senha || !cnpj) {
-      setError('Preenche todos os campos.');
+    if (!nome || !email || !senha) {
+      setError('Preenche nome, email e senha.');
       return;
     }
 
     setLoading(true);
     try {
-      await signUp({
+      const uid = await signUp({
         email,
         password: senha,
-        role: 'company',
+        role: 'candidate',
         profileData: {
-          nomeEmpresa: nome,
-          cnpj,
+          nome,
+          verificationStatus: 'pending',
+          profileCompleted: false,
         },
       });
 
-      navigation.navigate('LoginEmp');
+      setCadastroConcluido(true);
+
+      // dá um instante pra pessoa ler o aviso do laudo antes de seguir pro onboarding
+      setTimeout(() => {
+        navigation.navigate('OnboardingUser', { uid });
+      }, 2500);
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('Esse email já está cadastrado.');
@@ -64,6 +70,21 @@ export default function CadastroUser({ navigation }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (cadastroConcluido) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.form}>
+          <Text style={styles.subtitleText}>Cadastro realizado!</Text>
+          <Text style={{ textAlign: 'center', marginTop: 20, paddingHorizontal: 20, color: '#4a4a4a' }}>
+            Pra liberar sua conta, envie seu laudo médico para{' '}
+            <Text style={{ fontWeight: 'bold' }}>verificacao@accesshire.com</Text>{'\n\n'}
+            Vamos te levar pra completar seu perfil agora...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -96,19 +117,19 @@ export default function CadastroUser({ navigation }) {
                 <Text style={styles.brandAccent}>Access</Text>
                 <Text style={styles.brandDark}>Hire</Text>
               </Text>
-              <Text style={styles.subtitleText}>Cadastro De Empresas</Text>
+              <Text style={styles.subtitleText}>Cadastro De Usuários</Text>
             </View>
           </View>
 
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Nome da Empresa"
+              placeholder="Nome Completo"
               placeholderTextColor="#9b9b9b"
               value={nome}
               onChangeText={setNome}
               autoCapitalize="none"
-              accessibilityLabel="Campo de nome da empresa"
+              accessibilityLabel="Campo de nome completo"
             />
             <TextInput
               style={styles.input}
@@ -120,15 +141,6 @@ export default function CadastroUser({ navigation }) {
               keyboardType="email-address"
               autoCorrect={false}
               accessibilityLabel="Campo de email"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="CNPJ"
-              placeholderTextColor="#9b9b9b"
-              value={cnpj}
-              onChangeText={setCNPJ}
-              autoCapitalize="none"
-              accessibilityLabel="Campo de CNPJ"
             />
             <TextInput
               style={styles.input}
@@ -159,9 +171,7 @@ export default function CadastroUser({ navigation }) {
           </View>
 
           <View style={styles.footer}>
-            <Text
-              style={styles.footerText}
-              onPress={() => navigation.navigate('LoginEmp')}>
+            <Text style={styles.footerText} onPress={() => navigation.navigate('LoginUser')}>
               Já possui uma conta?{' '}
               <Text style={styles.footerLink}>Faça o login aqui!</Text>
             </Text>

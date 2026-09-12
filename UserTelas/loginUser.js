@@ -14,7 +14,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { signIn, getUserRole } from '../services/auth';
+import { signIn, getUserRole, getProfile } from '../services/auth';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -42,11 +42,17 @@ export default function Login({ navigation }) {
       const uid = await signIn({ email, password: senha });
       const role = await getUserRole(uid);
 
-      if (role === 'candidate') {
-        console.log('Login OK, papel: candidate. Navegar pra MenuUser quando a tela existir.');
+      if (role !== 'candidate') {
+        setError('Essa conta não é de candidato. Tenta o login de empresa.');
+        return;
+      }
+
+      const profile = await getProfile(uid, 'candidate');
+
+      if (profile?.profileCompleted) {
         navigation.navigate('MenuUser');
       } else {
-        setError('Essa conta não é de candidato. Tenta o login de empresa.');
+        navigation.navigate('OnboardingUser', { uid });
       }
     } catch (e) {
       if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
@@ -163,7 +169,6 @@ export default function Login({ navigation }) {
 
 function createStyles(scale, isSmallDevice, isTablet, screenHeight) {
   const maxContentWidth = isTablet ? 480 : '100%';
-
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#ffffff' },
     scrollContent: {

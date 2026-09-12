@@ -47,17 +47,18 @@ export default function Login({ navigation }) {
 
     setLoading(true);
     try {
-      await signUp({
+      const uid = await signUp({
         email,
         password: senha,
         role: 'company',
         profileData: {
           nomeEmpresa: nome,
           cnpj: cnpj.replace(/\D/g, ''),
+          profileCompleted: false,
         },
       });
 
-      navigation.navigate('LoginEmp');
+      navigation.navigate('OnboardingEmp', { uid });
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('Esse email já está cadastrado.');

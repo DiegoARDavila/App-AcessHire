@@ -14,7 +14,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { signIn, getUserRole } from '../services/auth';
+import { signIn, getUserRole, getProfile } from '../services/auth';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -42,10 +42,17 @@ export default function Login({ navigation }) {
       const uid = await signIn({ email, password: senha });
       const role = await getUserRole(uid);
 
-      if (role === 'company') {
+      if (role !== 'company') {
+        setError('Essa conta não é de empresa. Tenta o login de usuário.');
+        return;
+      }
+
+      const profile = await getProfile(uid, 'company');
+
+      if (profile?.profileCompleted) {
         navigation.navigate('MenuEmp');
       } else {
-        setError('Essa conta não é de empresa. Tenta o login de usuário.');
+        navigation.navigate('OnboardingEmp', { uid });
       }
     } catch (e) {
       if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
