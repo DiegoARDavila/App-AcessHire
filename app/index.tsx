@@ -17,6 +17,9 @@ import Acessibilidade from '../screens/Acessibilidade';
 import SobreNos from '../screens/SobreNos';
 import OnboardingUser from '../UserTelas/OnboardingUser';
 import OnboardingEmp from '../EmpTelas/OnboardingEmp';
+import AdicionarVagas from '../EmpTelas/AdicionarVagas';
+import VagasEmp from '../EmpTelas/VagasEmp';
+import VagasUser from '../UserTelas/VagasUser';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +43,10 @@ export default function RootLayout() {
           <Stack.Screen name="SobreNos" component={SobreNos} />
           <Stack.Screen name="OnboardingUser" component={OnboardingUser} />
           <Stack.Screen name="OnboardingEmp" component={OnboardingEmp} />
+          <Stack.Screen name="AdicionarVagas" component={AdicionarVagas} />
+          <Stack.Screen name="VagasEmp" component={VagasEmp} />
+          <Stack.Screen name="VagasUser" component={VagasUser} />
+          
         </Stack.Navigator>
       </NavigationContainer>
     </NavigationIndependentTree>

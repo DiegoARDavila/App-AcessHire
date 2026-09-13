@@ -1,4 +1,3 @@
-import { getApp } from '@react-native-firebase/app';
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -6,16 +5,12 @@ import {
   signOut as firebaseSignOut,
 } from '@react-native-firebase/auth';
 import {
-  getFirestore,
   doc,
   setDoc,
   getDoc,
   serverTimestamp,
 } from '@react-native-firebase/firestore';
-
-const app = getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { auth, db } from './firebase';
 
 export async function signUp({ email, password, role, profileData }) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);

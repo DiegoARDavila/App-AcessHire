@@ -50,7 +50,7 @@ export default function Login({ navigation }) {
       const profile = await getProfile(uid, 'company');
 
       if (profile?.profileCompleted) {
-        navigation.navigate('MenuEmp');
+        navigation.navigate('MenuEmp', { companyId: uid });
       } else {
         navigation.navigate('OnboardingEmp', { uid });
       }
