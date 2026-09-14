@@ -14,13 +14,16 @@ import {
 } from 'react-native';
 import {
   Ionicons,
-  FontAwesome,
   MaterialCommunityIcons,
+  Feather,
 } from '@expo/vector-icons';
 import { listenCompanyJobs } from '../services/jobs';
 
 const defaultEntrevistas = [
   { id: '1', data: '10/07', empresa: 'Rafael' },
+  { id: '2', data: '25/08', empresa: 'Paulo' },
+  { id: '3', data: '18/08', empresa: 'Maria' },
+  { id: '4', data: '27/08', empresa: 'Marcos' },
 ];
 
 export default function Menu({
@@ -51,10 +54,12 @@ export default function Menu({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
-          <Image
-            source={require('../assets/UserPhotoEX.png')}
-            style={styles.avatar}
-          />
+          <TouchableOpacity onPress={() => navigation.navigate('PerfilEmp')}>
+            <Image
+              source={require('../assets/UserPhotoEX.png')}
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
 
           <View style={styles.searchBar}>
             <TextInput
@@ -69,24 +74,25 @@ export default function Menu({
         </View>
 
         <View style={styles.cardVagasPublicadas}>
-          <View>
+          <TouchableOpacity onPress={() => navigation.navigate('VagasEmp', { companyId })}>
             <Text style={styles.vagasPublicadas}>Vagas publicadas</Text>
-          </View>
+          </TouchableOpacity>
 
           {vagas.length === 0 ? (
             <Text style={{ color: '#6D6D6D', marginTop: 10 }}>
               Nenhuma vaga publicada ainda.
             </Text>
           ) : (
-            vagas.map((vaga) => (
+            vagas.slice(0, 3).map((vaga) => (
               <TouchableOpacity
                 key={vaga.id}
                 onPress={() => navigation.navigate('VagasEmp', { companyId })}
-                style={styles.button}>
-                <View>
-                  <Text style={styles.cadidato}>{vaga.titulo}</Text>
-                  <Text>{vaga.localTrabalho}</Text>
+                style={styles.candidatoRow}>
+                <View style={styles.candidatoInfo}>
+                  <Text style={styles.candidatoNome}>{vaga.titulo}</Text>
+                  <Text style={styles.candidatoDetalhe}>{vaga.localTrabalho}</Text>
                 </View>
+                <Feather name="briefcase" size={22} color="#00BCD4" />
               </TouchableOpacity>
             ))
           )}
@@ -112,13 +118,20 @@ export default function Menu({
           </View>
 
           <View style={styles.sideCards}>
-            <View style={styles.badgeCard}></View>
+            <View style={styles.badgeCard}>
+              <Text>Falta 2% para a conclusão da lei de cotas</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#54c3ea" />
+        <Ionicons
+          name="home"
+          size={24 * scale}
+          color="#54c3ea"
+          onPress={() => navigation.navigate('MenuEmp', { companyId })}
+        />
         <Ionicons
           name="chatbubble-outline"
           size={22 * scale}
@@ -170,10 +183,16 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
     searchInput: { flex: 1, fontSize: 14 * scale, color: '#4a4a4a' },
     cardVagasPublicadas: {
       width: width * 0.9, alignSelf: 'center', borderRadius: 25, padding: 10, margin: 30,
-      borderWidth: 2, borderColor: 'black',
+      borderWidth: 2, borderColor: '#6D6D6D',
     },
     vagasPublicadas: { fontSize: 25, fontWeight: 'bold', fontFamily: 'InterBold' },
-    cadidato: { fontSize: 20, color: '#6D6D6D', fontFamily: 'InterBold', fontWeight: '600' },
+    candidatoRow: {
+      flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#6D6D6D',
+      borderRadius: 15, padding: 10, marginTop: 12,
+    },
+    candidatoInfo: { flex: 1, marginLeft: 4 },
+    candidatoNome: { fontSize: 16, color: '#6D6D6D', fontWeight: 'bold' },
+    candidatoDetalhe: { fontSize: 13, color: '#555' },
     sectionTitle: { fontSize: 22 * scale, fontWeight: '800', color: '#3a3a3a', marginBottom: 14 * scale },
     careerRow: { flexDirection: 'row', marginBottom: 20 * scale },
     entrevistasBox: {
