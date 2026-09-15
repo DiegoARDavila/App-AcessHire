@@ -1,24 +1,24 @@
-import { NavigationIndependentTree } from '@react-navigation/native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import Home from '../screens/Home';
-import LoginUser from '../UserTelas/loginUser';
-import CadastroUser from '../UserTelas/cadastroUser';
-import LoginEmp from '../EmpTelas/LoginEmp';
-import CadastroEmp from '../EmpTelas/CadastroEmp';
-import MenuEmp from '../EmpTelas/MenuEmp';
-import MenuUser from '../UserTelas/MenuUser';
-import ConfigUser from '../UserTelas/ConfigUser';
-import ConfigEmp from '../EmpTelas/ConfigEmp';
-import SegurancaUser from '../UserTelas/SegurancaUser';
-import Dados from '../screens/Dados';
-import Acessibilidade from '../screens/Acessibilidade';
-import SobreNos from '../screens/SobreNos';
-import OnboardingUser from '../UserTelas/OnboardingUser';
-import OnboardingEmp from '../EmpTelas/OnboardingEmp';
 import AdicionarVagas from '../EmpTelas/AdicionarVagas';
+import CadastroEmp from '../EmpTelas/CadastroEmp';
+import ConfigEmp from '../EmpTelas/ConfigEmp';
+import Interessados from '../EmpTelas/Interessados';
+import LoginEmp from '../EmpTelas/LoginEmp';
+import MenuEmp from '../EmpTelas/MenuEmp';
+import OnboardingEmp from '../EmpTelas/OnboardingEmp';
 import VagasEmp from '../EmpTelas/VagasEmp';
+import Acessibilidade from '../screens/Acessibilidade';
+import Dados from '../screens/Dados';
+import Home from '../screens/Home';
+import SobreNos from '../screens/SobreNos';
+import CadastroUser from '../UserTelas/cadastroUser';
+import ConfigUser from '../UserTelas/ConfigUser';
+import LoginUser from '../UserTelas/loginUser';
+import MenuUser from '../UserTelas/MenuUser';
+import OnboardingUser from '../UserTelas/OnboardingUser';
+import SegurancaUser from '../UserTelas/SegurancaUser';
 import VagasUser from '../UserTelas/VagasUser';
 
 const Stack = createNativeStackNavigator();
@@ -46,7 +46,7 @@ export default function RootLayout() {
           <Stack.Screen name="AdicionarVagas" component={AdicionarVagas} />
           <Stack.Screen name="VagasEmp" component={VagasEmp} />
           <Stack.Screen name="VagasUser" component={VagasUser} />
-          
+          <Stack.Screen name="Interessados" component={Interessados} />
         </Stack.Navigator>
       </NavigationContainer>
     </NavigationIndependentTree>

@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View, Text, Image, TextInput, StyleSheet, SafeAreaView,
-  useWindowDimensions, StatusBar, ScrollView, TouchableOpacity, Alert,
-} from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { listenCompanyJobs, deleteJob } from '../services/jobs';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { deleteJob, listenCompanyJobs } from '../services/jobs';
 
 export default function VagasEmp({ route, navigation, onSearch }) {
   const { companyId } = route.params;
@@ -59,6 +68,11 @@ export default function VagasEmp({ route, navigation, onSearch }) {
                   <Text style={styles.tituloVaga}>{vaga.titulo}</Text>
                   <Text style={styles.legendaEscura}>Local: {vaga.localTrabalho}</Text>
                   <View style={styles.buttomLine}>
+                    <TouchableOpacity
+                      style={styles.botoesSelecionado}
+                      onPress={() => navigation.navigate('Interessados', { jobId: vaga.id, companyId, vagaTitulo: vaga.titulo })}>
+                      <Text style={styles.legenda}>Ver Interessados</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.botoesEdicao} onPress={() => handleExcluir(vaga.id)}>
                       <Text style={styles.legenda}>Excluir</Text>
                     </TouchableOpacity>

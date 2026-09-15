@@ -1,27 +1,27 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
 import {
   Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { applyToJob } from '../services/applications';
+import { getProfile } from '../services/auth';
 import { auth } from '../services/firebase';
 import { listenOpenJobs } from '../services/jobs';
-import { applyToJob, hasApplied } from '../services/applications';
-import { getProfile } from '../services/auth';
 
 export default function VagasUser({ navigation, onSearch }) {
   const { width, height } = useWindowDimensions();
@@ -50,31 +50,38 @@ export default function VagasUser({ navigation, onSearch }) {
   }, []);
 
   async function handleCandidatar(vaga) {
-    if (verificationStatus !== 'verified') {
-      Alert.alert(
-        'Conta em verificação',
-        'Você poderá se candidatar assim que seu laudo médico for verificado.'
-      );
-      return;
-    }
-
-    setLoadingJobId(vaga.id);
-    try {
-      await applyToJob({ candidateUid: uid, jobId: vaga.id, companyId: vaga.companyId });
-      setAplicadas((prev) => ({ ...prev, [vaga.id]: true }));
-      Alert.alert('Candidatura enviada!', `Você se candidatou para ${vaga.titulo}.`);
-    } catch (e) {
-      if (e.message === 'already-applied') {
-        Alert.alert('Você já se candidatou', 'Sua candidatura para essa vaga já foi enviada.');
-        setAplicadas((prev) => ({ ...prev, [vaga.id]: true }));
-      } else {
-        Alert.alert('Erro', 'Não foi possível enviar sua candidatura. Tenta de novo.');
-        console.log(e);
-      }
-    } finally {
-      setLoadingJobId(null);
-    }
+  if (verificationStatus !== 'verified') {
+    Alert.alert(
+      'Conta em verificação',
+      'Você poderá se candidatar assim que seu laudo médico for verificado.'
+    );
+    return;
   }
+
+  setLoadingJobId(vaga.id);
+  try {
+    const meuPerfil = await getProfile(uid, 'candidate');
+    await applyToJob({
+      candidateUid: uid,
+      jobId: vaga.id,
+      companyId: vaga.companyId,
+      candidateNome: meuPerfil?.nome,
+      candidateAreaAtuacao: meuPerfil?.areaAtuacao,
+    });
+    setAplicadas((prev) => ({ ...prev, [vaga.id]: true }));
+    Alert.alert('Candidatura enviada!', `Você se candidatou para ${vaga.titulo}.`);
+  } catch (e) {
+    if (e.message === 'already-applied') {
+      Alert.alert('Você já se candidatou', 'Sua candidatura para essa vaga já foi enviada.');
+      setAplicadas((prev) => ({ ...prev, [vaga.id]: true }));
+    } else {
+      Alert.alert('Erro', 'Não foi possível enviar sua candidatura. Tente de novo.');
+      console.log(e);
+    }
+  } finally {
+    setLoadingJobId(null);
+  }
+}
 
   return (
     <SafeAreaView style={styles.safeArea}>
