@@ -1,17 +1,16 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  useWindowDimensions,
   Dimensions,
-  StatusBar,
+  Image,
   Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from 'react-native';
-import { useFonts } from 'expo-font';
 
 const { width } = Dimensions.get('window');
 
@@ -66,20 +65,6 @@ export default function Home({ navigation }) {
             onPress={() => navigation.navigate('LoginEmp')}>
             <Text style={styles.buttonTextSecondary}>Empresa</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.buttonSecondary]}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            onPress={() => navigation.navigate('MenuUser')}>
-            <Text style={styles.buttonTextSecondary}>MenuUser (Teste)</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.buttonSecondary]}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            onPress={() => navigation.navigate('MenuEmp')}>
-            <Text style={styles.buttonTextSecondary}>MenuEmp (Teste)</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.footerSpacer} />
@@ -89,10 +74,10 @@ export default function Home({ navigation }) {
 }
  
 function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean,
-  screenHeight: number
+  scale,
+  isSmallDevice,
+  isTablet,
+  screenHeight
 ) {
   const maxContentWidth = isTablet ? 480 : '100%';
  
