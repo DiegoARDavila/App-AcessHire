@@ -1,15 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
 import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  StyleSheet,
   SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
   ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function DadosUser({ navigation }) {
   const { width } = useWindowDimensions();
@@ -61,9 +59,9 @@ export default function DadosUser({ navigation }) {
 }
 
 function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean
+  scale,
+  isSmallDevice,
+  isTablet
 ) {
   return StyleSheet.create({
     safeArea: {

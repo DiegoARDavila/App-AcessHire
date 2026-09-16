@@ -8,6 +8,7 @@ import {
   setDoc,
   where,
 } from '@react-native-firebase/firestore';
+import { ensureConversation } from './chat';
 import { db } from './firebase';
 
 function buildApplicationId(candidateUid, jobId) {
@@ -27,7 +28,7 @@ export async function applyToJob({ candidateUid, jobId, companyId, candidateNome
     throw new Error('already-applied');
   }
 
-  return setDoc(doc(db, 'applications', applicationId), {
+  await setDoc(doc(db, 'applications', applicationId), {
     candidateUid,
     jobId,
     companyId,
@@ -36,6 +37,8 @@ export async function applyToJob({ candidateUid, jobId, companyId, candidateNome
     candidateAreaAtuacao: candidateAreaAtuacao || null,
     data: serverTimestamp(),
   });
+
+  await ensureConversation(candidateUid, companyId);
 }
 
 export function listenJobApplications(jobId, companyId, callback) {
