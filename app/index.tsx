@@ -17,6 +17,7 @@ import Chat from '../screens/Chat';
 import Conversas from '../screens/Conversa';
 import Dados from '../screens/Dados';
 import Home from '../screens/Home';
+import Notificacoes from '../screens/Notificacoes';
 import SobreNos from '../screens/SobreNos';
 
 // Telas UserTelas
@@ -65,6 +66,7 @@ export default function RootLayout() {
           <Stack.Screen name="Dados" component={Dados} />
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />
           <Stack.Screen name="SobreNos" component={SobreNos} />
+          <Stack.Screen name="Notificacoes" component={Notificacoes} />
 
           {/* Chat e Conversas */}
           <Stack.Screen name="Chat" component={Chat} />

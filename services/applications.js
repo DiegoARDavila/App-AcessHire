@@ -10,6 +10,7 @@ import {
 } from '@react-native-firebase/firestore';
 import { ensureConversation } from './chat';
 import { db } from './firebase';
+import { createNotification } from './notifications';
 
 function buildApplicationId(candidateUid, jobId) {
   return `${candidateUid}_${jobId}`;
@@ -39,6 +40,12 @@ export async function applyToJob({ candidateUid, jobId, companyId, candidateNome
   });
 
   await ensureConversation(candidateUid, companyId);
+
+  await createNotification({
+  recipientUid: companyId,
+  tipo: 'nova_candidatura',
+  texto: `Novo candidato se interessou por uma vaga.`,
+});
 }
 
 export function listenJobApplications(jobId, companyId, callback) {
