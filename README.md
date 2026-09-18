@@ -75,8 +75,8 @@ Escaneie o QR Code com o app de desenvolvimento instalado no celular (gerado via
 
 ## Autores
 
-Diego André Rantes Davila
-Guilherme Akira Suma
-Guilherme Isaac de Oliveira Almeida
-Guilherme Pereira Maciel
-Gustavo dos Santos Ferreira
+- **Diego André Rantes Davila
+- **Guilherme Akira Suma
+- **Guilherme Isaac de Oliveira Almeida
+- **Guilherme Pereira Maciel
+- **Gustavo dos Santos Ferreira
