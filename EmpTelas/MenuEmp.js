@@ -1,37 +1,25 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import {
+  Feather,
   Ionicons,
   MaterialCommunityIcons,
-  Feather,
 } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { listenCompanyJobs } from '../services/jobs';
 
-const defaultEntrevistas = [
-  { id: '1', data: '10/07', empresa: 'Rafael' },
-  { id: '2', data: '25/08', empresa: 'Paulo' },
-  { id: '3', data: '18/08', empresa: 'Maria' },
-  { id: '4', data: '27/08', empresa: 'Marcos' },
-];
-
-export default function Menu({
-  route,
-  navigation,
-  entrevistas = defaultEntrevistas,
-  onSearch,
-}) {
+export default function Menu({ route, navigation, onSearch }) {
   const { companyId } = route.params;
   const { width, height } = useWindowDimensions();
   const isSmallDevice = width < 360;
@@ -74,20 +62,21 @@ export default function Menu({
         </View>
 
         <View style={styles.cardVagasPublicadas}>
-          <TouchableOpacity onPress={() => navigation.navigate('VagasEmp', { companyId })}>
-            <Text style={styles.vagasPublicadas}>Vagas publicadas</Text>
-          </TouchableOpacity>
+          <Text style={styles.vagasPublicadas}>Vagas publicadas</Text>
 
           {vagas.length === 0 ? (
-            <Text style={{ color: '#6D6D6D', marginTop: 10 }}>
+            <Text style={{ color: '#6D6D6D', marginLeft: 10, marginBottom: 10 }}>
               Nenhuma vaga publicada ainda.
             </Text>
           ) : (
-            vagas.slice(0, 3).map((vaga) => (
+            vagas.slice(0, 3).map((vaga, index) => (
               <TouchableOpacity
                 key={vaga.id}
                 onPress={() => navigation.navigate('VagasEmp', { companyId })}
-                style={styles.candidatoRow}>
+                style={[
+                  styles.candidatoRow,
+                  index === Math.min(vagas.length, 3) - 1 && styles.candidatoRowLast,
+                ]}>
                 <View style={styles.candidatoInfo}>
                   <Text style={styles.candidatoNome}>{vaga.titulo}</Text>
                   <Text style={styles.candidatoDetalhe}>{vaga.localTrabalho}</Text>
@@ -103,23 +92,25 @@ export default function Menu({
         <View style={styles.careerRow}>
           <View style={styles.entrevistasBox}>
             <Text style={styles.entrevistasHeader}>Entrevistas</Text>
-            {entrevistas.map((item, index) => (
-              <View
-                key={item.id}
-                style={[
-                  styles.entrevistaRow,
-                  index === entrevistas.length - 1 && styles.entrevistaRowLast,
-                ]}>
-                <Text style={styles.entrevistaText}>
-                  {item.data} - {item.empresa}
-                </Text>
-              </View>
-            ))}
+            <View style={styles.entrevistaRowLast}>
+              <Text style={styles.entrevistaText}>Ainda não implementado</Text>
+            </View>
           </View>
 
           <View style={styles.sideCards}>
             <View style={styles.badgeCard}>
-              <Text>Falta 2% para a conclusão da lei de cotas</Text>
+              <View style={styles.viewCalculo}>
+                <Text style={styles.calculoTexto}>Falta 2% para a conclusão da</Text>
+                <Text style={styles.calculoTexto}>lei de cotas</Text>
+              </View>
+
+              <View>
+                <TouchableOpacity
+                  style={styles.buttomEditar}
+                  onPress={() => navigation.navigate('CalculoEmp')}>
+                  <Text style={styles.textoEditar}>Editar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -182,15 +173,16 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
     },
     searchInput: { flex: 1, fontSize: 14 * scale, color: '#4a4a4a' },
     cardVagasPublicadas: {
-      width: width * 0.9, alignSelf: 'center', borderRadius: 25, padding: 10, margin: 30,
-      borderWidth: 2, borderColor: '#6D6D6D',
+      width: width * 0.9, alignSelf: 'center', borderRadius: 25, paddingTop: 12, paddingBottom: 4,
+      margin: 30, borderWidth: 2, borderColor: '#6D6D6D',
     },
-    vagasPublicadas: { fontSize: 25, fontWeight: 'bold', fontFamily: 'InterBold' },
+    vagasPublicadas: { fontSize: 25, fontWeight: 'bold', fontFamily: 'InterBold', marginBottom: 12, marginLeft: 10 },
     candidatoRow: {
-      flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#6D6D6D',
-      borderRadius: 15, padding: 10, marginTop: 12,
+      flexDirection: 'row', alignItems: 'center', width: '100%', paddingVertical: 12, paddingHorizontal: 4,
+      borderBottomWidth: 1, borderTopWidth: 1, borderBottomColor: '#d9d9d9',
     },
-    candidatoInfo: { flex: 1, marginLeft: 4 },
+    candidatoRowLast: { borderBottomWidth: 0 },
+    candidatoInfo: { flex: 1, marginLeft: 12 },
     candidatoNome: { fontSize: 16, color: '#6D6D6D', fontWeight: 'bold' },
     candidatoDetalhe: { fontSize: 13, color: '#555' },
     sectionTitle: { fontSize: 22 * scale, fontWeight: '800', color: '#3a3a3a', marginBottom: 14 * scale },
@@ -204,8 +196,7 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
       paddingVertical: 10 * scale, paddingHorizontal: 12 * scale,
       borderBottomWidth: 1, borderBottomColor: '#3a3a3a', textAlign: 'center',
     },
-    entrevistaRow: { paddingVertical: 12 * scale, paddingHorizontal: 12 * scale, borderBottomWidth: 1, borderBottomColor: '#d9d9d9' },
-    entrevistaRowLast: { borderBottomWidth: 0 },
+    entrevistaRowLast: { paddingVertical: 12 * scale, paddingHorizontal: 12 * scale },
     entrevistaText: { fontSize: 12.5 * scale, color: '#4a4a4a', textAlign: 'center' },
     sideCards: { flex: 1, justifyContent: 'space-between' },
     badgeCard: {
@@ -218,5 +209,12 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
       backgroundColor: '#e9e6f2', borderRadius: 30 * scale,
       marginHorizontal: isSmallDevice ? 16 : 24, marginBottom: 20 * scale, paddingVertical: 12 * scale,
     },
+    buttomEditar: {
+      backgroundColor: '#45C5F3', height: 35 * scale, width: 100 * scale,
+      borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+    },
+    textoEditar: { color: '#ffff', fontSize: 18 },
+    calculoTexto: { fontSize: 10, color: '#6D6D6D' },
+    viewCalculo: { justifyContent: 'center', alignItems: 'center' },
   });
 }

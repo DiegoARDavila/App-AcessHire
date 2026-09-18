@@ -1,41 +1,23 @@
-import React from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  Ionicons,
   FontAwesome,
+  Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
+import React from 'react';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
-type Entrevista = {
-  id: string,
-  data: string,
-  empresa: string,
-};
-
-type Contato = {
-  id: string,
-  avatarUri: string,
-};
-
-type HomeScreenProps = {
-  entrevistas?: Entrevista[],
-  contatos?: Contato[],
-  totalContatos?: number,
-  onSearch?: (query: string) => void,
-};
-
-const defaultEntrevistas: Entrevista[] = [
+const defaultEntrevistas = [
   { id: '1', data: '10/06', empresa: 'Monster' },
   { id: '2', data: '25/06', empresa: 'Sony' },
   { id: '3', data: '18/07', empresa: 'Google' },
@@ -47,25 +29,36 @@ export default function Menu({
   contatos = [],
   totalContatos,
   onSearch,
-}: HomeScreenProps) {
-  const { width, height } = useWindowDimensions();
+}) {
+  const { width } = useWindowDimensions();
+
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
-  const scale = Math.min(Math.max(width / 320, 0.85), isTablet ? 1.5 : 1.2);
+  const scale = Math.min(
+    Math.max(width / 320, 0.85),
+    isTablet ? 1.5 : 1.2
+  );
 
   const styles = createStyles(scale, isSmallDevice, isTablet, width);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.topBar}>
-          <Image
-            source={require('../assets/UserPhotoEX.png')}
-            style={styles.avatar}
-          />
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('PerfilUser')}
+          >
+            <Image
+              source={require('../assets/UserPhotoEX.png')}
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
 
           <View style={styles.searchBar}>
             <TextInput
@@ -75,17 +68,27 @@ export default function Menu({
               onChangeText={onSearch}
               accessibilityLabel="Campo de pesquisa"
             />
-            <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
+
+            <Ionicons
+              name="search"
+              size={18 * scale}
+              color="#9b9b9b"
+            />
           </View>
         </View>
 
         <View style={styles.cardVagas}>
           <TouchableOpacity
             onPress={() => navigation.navigate('VagasUser')}
-            style={styles.button}>
-            <View style={{ flex: 1 }}>
+            style={styles.button}
+            activeOpacity={0.8}
+          >
+            <View style={styles.cardTextContainer}>
               <Text style={styles.cardTitle}>Procure vagas</Text>
-              <Text style={styles.cardSub}>Encontre sua vaga ideal.</Text>
+
+              <Text style={styles.cardSub}>
+                Encontre sua vaga ideal.
+              </Text>
             </View>
 
             <Image
@@ -99,14 +102,19 @@ export default function Menu({
 
         <View style={styles.careerRow}>
           <View style={styles.entrevistasBox}>
-            <Text style={styles.entrevistasHeader}>Entrevistas</Text>
+            <Text style={styles.entrevistasHeader}>
+              Entrevistas
+            </Text>
+
             {entrevistas.map((item, index) => (
               <View
                 key={item.id}
                 style={[
                   styles.entrevistaRow,
-                  index === entrevistas.length - 1 && styles.entrevistaRowLast,
-                ]}>
+                  index === entrevistas.length - 1 &&
+                  styles.entrevistaRowLast,
+                ]}
+              >
                 <Text style={styles.entrevistaText}>
                   {item.data} - {item.empresa}
                 </Text>
@@ -124,18 +132,22 @@ export default function Menu({
                     style={styles.contatoAvatar}
                   />
                 ))}
-                {Array.from({ length: Math.max(0, 4 - contatos.length) }).map(
-                  (_, i) => (
-                    <View
-                      key={`vazio-${i}`}
-                      style={styles.contatoAvatarVazio}
-                    />
-                  )
-                )}
+
+                {Array.from({
+                  length: Math.max(0, 4 - contatos.length),
+                }).map((_, i) => (
+                  <View
+                    key={`vazio-${i}`}
+                    style={styles.contatoAvatarVazio}
+                  />
+                ))}
               </View>
+
               {typeof totalContatos === 'number' && (
                 <View style={styles.badgeCountWrapper}>
-                  <Text style={styles.badgeCountText}>+{totalContatos}</Text>
+                  <Text style={styles.badgeCountText}>
+                    +{totalContatos}
+                  </Text>
                 </View>
               )}
             </View>
@@ -147,12 +159,14 @@ export default function Menu({
                 color="#ffffff"
                 style={styles.socialIcon}
               />
+
               <FontAwesome
                 name="instagram"
                 size={16 * scale}
                 color="#ffffff"
                 style={styles.socialIcon}
               />
+
               <FontAwesome
                 name="twitter"
                 size={16 * scale}
@@ -164,9 +178,15 @@ export default function Menu({
         </View>
 
         <View style={styles.vagaInteresseCard}>
-          <Text style={styles.vagaInteresseTitle}>Vagas de interesse</Text>
+          <Text style={styles.vagaInteresseTitle}>
+            Vagas de interesse
+          </Text>
+
           <View style={styles.vagaInteresseRow}>
-            <Text style={styles.vagaInteresseSubtitle}>Microsoft</Text>
+            <Text style={styles.vagaInteresseSubtitle}>
+              Microsoft
+            </Text>
+
             <Ionicons
               name="information-circle-outline"
               size={18 * scale}
@@ -177,53 +197,79 @@ export default function Menu({
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons 
-          name="home" 
-          size={24 * scale} 
-          color="#54c3ea"   
-        />
-        <Ionicons
-          name="chatbubble-outline"
-          size={22 * scale}
-          color="#6f6f6f"
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('Menu')}
+        >
+          <Ionicons
+            name="home"
+            size={24 * scale}
+            color="#54c3ea"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
           onPress={() => navigation.navigate('Chat')}
-        />
-        <MaterialCommunityIcons
-          name="briefcase-outline"
-          size={23 * scale}
-          color="#6f6f6f"
+        >
+          <Ionicons
+            name="chatbubble-outline"
+            size={22 * scale}
+            color="#6f6f6f"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
           onPress={() => navigation.navigate('VagasUser')}
-        />
-        <Ionicons
-          name="notifications-outline"
-          size={23 * scale}
-          color="#6f6f6f"
+        >
+          <MaterialCommunityIcons
+            name="briefcase-outline"
+            size={23 * scale}
+            color="#6f6f6f"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
           onPress={() => navigation.navigate('Notificacoes')}
-        />
-        <Ionicons 
-        name="menu" 
-        size={24 * scale} 
-        color="#6f6f6f" 
-        onPress={() => navigation.navigate('ConfigUser')}
-        />
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={23 * scale}
+            color="#6f6f6f"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('ConfigUser')}
+        >
+          <Ionicons
+            name="menu"
+            size={24 * scale}
+            color="#6f6f6f"
+          />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
 function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean,
-  width: number
+  scale,
+  isSmallDevice,
+  isTablet,
+  width
 ) {
-  const maxContentWidth = isTablet ? 520 : '100%';
+  const maxContentWidth = isTablet ? 520 : undefined;
 
   return StyleSheet.create({
     safeArea: {
       flex: 1,
       backgroundColor: '#ffffff',
     },
+
     scrollContent: {
       paddingHorizontal: isSmallDevice ? 16 : 24,
       paddingTop: 40,
@@ -232,16 +278,19 @@ function createStyles(
       width: '100%',
       alignSelf: 'center',
     },
+
     topBar: {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 16 * scale,
     },
+
     avatar: {
       width: 44 * scale,
       height: 44 * scale,
       borderRadius: 22 * scale,
     },
+
     searchBar: {
       flex: 1,
       flexDirection: 'row',
@@ -252,6 +301,7 @@ function createStyles(
       paddingVertical: 10 * scale,
       marginLeft: 12 * scale,
     },
+
     searchInput: {
       flex: 1,
       fontSize: 14 * scale,
@@ -267,6 +317,17 @@ function createStyles(
       flexDirection: 'row',
       alignItems: 'center',
       margin: 30,
+    },
+
+    button: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      minHeight: width * 0.28,
+    },
+
+    cardTextContainer: {
+      flex: 1,
     },
 
     cardTitle: {
@@ -287,19 +348,22 @@ function createStyles(
       width: width * 0.4,
       height: width * 0.4,
       position: 'absolute',
-      right: width * -0.35,
+      right: width * -0.1,
       top: width * -0.17,
     },
+
     sectionTitle: {
       fontSize: 22 * scale,
       fontWeight: '800',
       color: '#3a3a3a',
       marginBottom: 14 * scale,
     },
+
     careerRow: {
       flexDirection: 'row',
       marginBottom: 20 * scale,
     },
+
     entrevistasBox: {
       flex: 1.2,
       borderWidth: 1,
@@ -308,6 +372,7 @@ function createStyles(
       overflow: 'hidden',
       marginRight: 10 * scale,
     },
+
     entrevistasHeader: {
       fontSize: 14 * scale,
       fontWeight: '700',
@@ -318,24 +383,29 @@ function createStyles(
       borderBottomColor: '#3a3a3a',
       textAlign: 'center',
     },
+
     entrevistaRow: {
       paddingVertical: 12 * scale,
       paddingHorizontal: 12 * scale,
       borderBottomWidth: 1,
       borderBottomColor: '#d9d9d9',
     },
+
     entrevistaRowLast: {
       borderBottomWidth: 0,
     },
+
     entrevistaText: {
       fontSize: 12.5 * scale,
       color: '#4a4a4a',
       textAlign: 'center',
     },
+
     sideCards: {
       flex: 1,
       justifyContent: 'space-between',
     },
+
     badgeCard: {
       flex: 1,
       backgroundColor: '#d9cf9a',
@@ -345,10 +415,12 @@ function createStyles(
       marginBottom: 10 * scale,
       position: 'relative',
     },
+
     badgeDotsRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
+
     contatoAvatar: {
       width: 28 * scale,
       height: 28 * scale,
@@ -356,6 +428,7 @@ function createStyles(
       borderWidth: 2,
       borderColor: '#ffffff',
     },
+
     contatoAvatarVazio: {
       width: 28 * scale,
       height: 28 * scale,
@@ -363,6 +436,7 @@ function createStyles(
       backgroundColor: '#ffffff',
       opacity: 0.6,
     },
+
     badgeCountWrapper: {
       position: 'absolute',
       bottom: 8 * scale,
@@ -372,11 +446,13 @@ function createStyles(
       paddingHorizontal: 6 * scale,
       paddingVertical: 2 * scale,
     },
+
     badgeCountText: {
       fontSize: 10 * scale,
       color: '#ffffff',
       fontWeight: '700',
     },
+
     socialCard: {
       flex: 1,
       backgroundColor: '#f3c9dd',
@@ -385,30 +461,36 @@ function createStyles(
       alignItems: 'center',
       justifyContent: 'center',
     },
+
     socialIcon: {
       marginHorizontal: 6 * scale,
     },
+
     vagaInteresseCard: {
       backgroundColor: '#54c3ea',
       borderRadius: 18 * scale,
       padding: 18 * scale,
     },
+
     vagaInteresseTitle: {
       fontSize: 17 * scale,
       fontWeight: '800',
       color: '#ffffff',
       marginBottom: 8 * scale,
     },
+
     vagaInteresseRow: {
       flexDirection: 'row',
       alignItems: 'center',
     },
+
     vagaInteresseSubtitle: {
       fontSize: 14 * scale,
       color: '#ffffff',
       fontWeight: '600',
       marginRight: 6 * scale,
     },
+
     bottomNav: {
       flexDirection: 'row',
       justifyContent: 'space-around',

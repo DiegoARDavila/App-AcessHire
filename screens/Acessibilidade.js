@@ -1,17 +1,6 @@
-import { useRef, useState } from 'react';
-import { Switch } from 'react-native';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
-  ScrollView,
-  PanResponder,
-  TouchableOpacity,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRef, useState } from 'react';
+import { PanResponder, SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 
 const opcoesFonte = ['Pequena', 'Média', 'Grande'];
 const previewSizes = [13, 17, 22];
@@ -33,7 +22,7 @@ export default function DadosUser({ navigation }) {
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const thumbSize = 22 * scale;
 
-  const updateStepFromX = (x: number) => {
+  const updateStepFromX = (x) => {
     const currentTrackWidth = trackWidthRef.current;
     if (currentTrackWidth <= 0) return;
     const ratio = Math.min(Math.max(x / currentTrackWidth, 0), 1);
@@ -68,7 +57,7 @@ export default function DadosUser({ navigation }) {
 
       <View style={styles.topBar}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => navigation.goBack()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           style={styles.backIcon}>
           <Ionicons name="arrow-back" size={22 * scale} color="#4a4a4a" />
@@ -177,9 +166,9 @@ export default function DadosUser({ navigation }) {
 }
 
 function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean
+  scale,
+  isSmallDevice,
+  isTablet
 ) {
   return StyleSheet.create({
     safeArea: {

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  SafeAreaView, ScrollView, ActivityIndicator,
+  ActivityIndicator,
+  SafeAreaView, ScrollView,
+  StyleSheet,
+  Text, TextInput, TouchableOpacity,
+  View,
 } from 'react-native';
 import { completeProfile } from '../services/auth';
 
@@ -49,7 +52,7 @@ export default function OnboardingEmp({ route, navigation }) {
         site: site || null,
         descricao: descricao || null,
       });
-      navigation.navigate('MenuEmp');
+      navigation.navigate('MenuEmp', { companyId: uid });
     } catch (e) {
       setError('Erro ao salvar. Tenta de novo.');
       console.log(e);

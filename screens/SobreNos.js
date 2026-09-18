@@ -1,15 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
 import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  StyleSheet,
   SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
   ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SobreNos({ navigation }) {
   const { width } = useWindowDimensions();
@@ -29,7 +27,7 @@ export default function SobreNos({ navigation }) {
           size={22 * scale}
           color="#4a4a4a"
           style={styles.backIcon}
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => navigation.goBack()}
         />
         <View style={styles.topBarContent}>
           <Text style={styles.topBarTitle}>Configurações</Text>
@@ -69,9 +67,9 @@ export default function SobreNos({ navigation }) {
 }
 
 function createStyles(
-  scale: number,
-  isSmallDevice: boolean,
-  isTablet: boolean
+  scale,
+  isSmallDevice,
+  isTablet
 ) {
   return StyleSheet.create({
     safeArea: {

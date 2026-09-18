@@ -4,11 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // Telas EmpTelas
 import AdicionarVagas from '../EmpTelas/AdicionarVagas';
 import CadastroEmp from '../EmpTelas/CadastroEmp';
+import CalculoEmp from '../EmpTelas/CalculoEmp';
 import ConfigEmp from '../EmpTelas/ConfigEmp';
 import Interessados from '../EmpTelas/Interessados';
 import LoginEmp from '../EmpTelas/LoginEmp';
 import MenuEmp from '../EmpTelas/MenuEmp';
 import OnboardingEmp from '../EmpTelas/OnboardingEmp';
+import PerfilEmp from '../EmpTelas/PerfilEmp';
 import VagasEmp from '../EmpTelas/VagasEmp';
 
 // Telas screens
@@ -26,6 +28,7 @@ import ConfigUser from '../UserTelas/ConfigUser';
 import LoginUser from '../UserTelas/loginUser';
 import MenuUser from '../UserTelas/MenuUser';
 import OnboardingUser from '../UserTelas/OnboardingUser';
+import PerfilUser from '../UserTelas/PerfilUser';
 import SegurancaUser from '../UserTelas/SegurancaUser';
 import VagasUser from '../UserTelas/VagasUser';
 
@@ -51,6 +54,7 @@ export default function RootLayout() {
           <Stack.Screen name="SegurancaUser" component={SegurancaUser} />
           <Stack.Screen name="OnboardingUser" component={OnboardingUser} />
           <Stack.Screen name="VagasUser" component={VagasUser} />
+          <Stack.Screen name="PerfilUser" component={PerfilUser}/>
 
           {/* Empresa */}
           <Stack.Screen name="LoginEmp" component={LoginEmp} />
@@ -61,7 +65,9 @@ export default function RootLayout() {
           <Stack.Screen name="AdicionarVagas" component={AdicionarVagas} />
           <Stack.Screen name="VagasEmp" component={VagasEmp} />
           <Stack.Screen name="Interessados" component={Interessados} />
-
+          <Stack.Screen name="PerfilEmp" component={PerfilEmp}/>
+          <Stack.Screen name="CalculoEmp" component={CalculoEmp}/>
+          
           {/* Outras telas */}
           <Stack.Screen name="Dados" component={Dados} />
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />

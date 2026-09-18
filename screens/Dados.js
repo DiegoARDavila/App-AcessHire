@@ -27,7 +27,7 @@ export default function DadosUser({ navigation }) {
           size={22 * scale}
           color="#4a4a4a"
           style={styles.backIcon}
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => navigation.goBack()}
         />
         <View style={styles.topBarContent}>
           <Text style={styles.topBarTitle}>Configurações</Text>
