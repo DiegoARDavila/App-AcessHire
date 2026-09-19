@@ -31,7 +31,7 @@ App de vagas de emprego voltado para pessoas com deficiência (PCD), conectando 
 ### Passos
 
 ```bash
-git clone https://github.com/Gustavowrkdev09/AccessHireApp.git
+git clone https://github.com/DiegoARDavila/App-AcessHire.git
 cd AccessHireApp
 npm install
 ```
