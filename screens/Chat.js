@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -16,8 +15,8 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { useRotas } from '../hooks/useRotas';
 import { listenUserConversations } from '../services/chat';
-import { auth } from '../services/firebase';
 
 export default function Chat({ navigation, onSearch }) {
   const { width, height } = useWindowDimensions();
@@ -27,7 +26,9 @@ export default function Chat({ navigation, onSearch }) {
 
   const styles = createStyles(scale, isSmallDevice, isTablet, width);
 
-  const uid = auth.currentUser?.uid;
+  const { rotas, uid } = useRotas();
+  const ir = (chave) => rotas && navigation.navigate(rotas[chave], { companyId: uid });
+
   const [conversas, setConversas] = useState([]);
 
   useEffect(() => {
@@ -97,15 +98,16 @@ export default function Chat({ navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.goBack()} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => ir('home')} />
         <Ionicons name="chatbubble-outline" size={22 * scale} color="#54c3ea" />
-        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('VagasUser')}/>
+        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => ir('vagas')} />
         <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Notificacoes')} />
-        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('ConfigUser')} />
+        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => ir('config')} />
       </View>
     </SafeAreaView>
   );
 }
+
 
 function createStyles(scale, isSmallDevice, isTablet, width) {
   const maxContentWidth = isTablet ? 520 : '100%';

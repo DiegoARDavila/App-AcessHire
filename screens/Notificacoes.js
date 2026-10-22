@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import {
@@ -12,7 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { auth } from '../services/firebase';
+import { useRotas } from '../hooks/useRotas';
 import { listenUserNotifications } from '../services/notifications';
 
 export default function Notificacoes({ navigation, onSearch }) {
@@ -22,7 +21,9 @@ export default function Notificacoes({ navigation, onSearch }) {
   const scale = Math.min(Math.max(width / 320, 0.85), isTablet ? 1.5 : 1.2);
   const styles = createStyles(scale, isSmallDevice, isTablet);
 
-  const uid = auth.currentUser?.uid;
+  const { rotas, uid } = useRotas();
+  const ir = (chave) => rotas && navigation.navigate(rotas[chave], { companyId: uid });
+
   const [notificacoes, setNotificacoes] = useState([]);
 
   useEffect(() => {
@@ -74,15 +75,16 @@ export default function Notificacoes({ navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.goBack()} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => ir('home')} />
         <Ionicons name="chatbubble" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
-        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('VagasUser')} />
+        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => ir('vagas')} />
         <Ionicons name="notifications-outline" size={23 * scale} color="#54c3ea" />
-        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('ConfigUser')} />
+        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => ir('config')} />
       </View>
     </SafeAreaView>
   );
 }
+
 
 function createStyles(scale, isSmallDevice, isTablet) {
   const maxContentWidth = isTablet ? 520 : '100%';
