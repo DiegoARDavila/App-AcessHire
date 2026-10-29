@@ -160,6 +160,20 @@ export default function DadosUser({ navigation }) {
             thumbColor="#ffffff"
           />
         </View>
+        <View style={styles.cardConfig2}>
+          <Ionicons
+            name="hand-left-outline"
+            size={30 * scale}
+            color="#45c5f3"
+          />
+          <Text style={styles.titleFont}t>Feedback tátil</Text>
+          <Switch
+            value={lTativo}
+            onValueChange={setLTativo}
+            trackColor={{ false: '#d9d9d9', true: '#54c3ea' }}
+            thumbColor="#ffffff"
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
