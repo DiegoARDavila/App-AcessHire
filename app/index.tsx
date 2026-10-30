@@ -1,5 +1,15 @@
-import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
+// IMPORTANTE: este import precisa ser o primeiro do arquivo (acessibilidade global)
+import '../utils/acessibilidadeGlobal';
+
+import {
+  NavigationContainer,
+  NavigationIndependentTree,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, View } from 'react-native';
 
 // Telas EmpTelas
 import AdicionarVagas from '../EmpTelas/AdicionarVagas';
@@ -32,12 +42,90 @@ import PerfilUser from '../UserTelas/PerfilUser';
 import SegurancaUser from '../UserTelas/SegurancaUser';
 import VagasUser from '../UserTelas/VagasUser';
 
+import { carregarAcessibilidade, useAcessibilidade } from '../services/acessibilidade';
+
 const Stack = createNativeStackNavigator();
 
+// Nome falado pelo leitor de telas quando a pessoa muda de tela
+const NOMES_TELAS: Record<string, string> = {
+  Home: 'Tela inicial',
+  LoginUser: 'Login do candidato',
+  CadastroUser: 'Cadastro do candidato',
+  OnboardingUser: 'Complete seu perfil',
+  MenuUser: 'Início',
+  VagasUser: 'Vagas',
+  PerfilUser: 'Seu perfil',
+  ConfigUser: 'Configurações',
+  SegurancaUser: 'Segurança',
+  LoginEmp: 'Login da empresa',
+  CadastroEmp: 'Cadastro da empresa',
+  OnboardingEmp: 'Complete o perfil da empresa',
+  MenuEmp: 'Início',
+  VagasEmp: 'Vagas publicadas',
+  AdicionarVagas: 'Nova vaga',
+  Interessados: 'Interessados na vaga',
+  PerfilEmp: 'Perfil da empresa',
+  CalculoEmp: 'Lei de cotas',
+  ConfigEmp: 'Configurações',
+  Dados: 'Privacidade de dados',
+  Acessibilidade: 'Acessibilidade',
+  SobreNos: 'Sobre nós',
+  Notificacoes: 'Notificações',
+  Chat: 'Conversas',
+  Conversas: 'Conversa',
+};
+
 export default function RootLayout() {
+  const { fontStep, altoContraste, leitorTelas, feedbackTatil } = useAcessibilidade();
+  const [pronto, setPronto] = useState(false);
+  const navRef = useNavigationContainerRef();
+  const estadoNav = useRef<any>(undefined);
+  const rotaAnterior = useRef<string | undefined>(undefined);
+  const toqueInicio = useRef<{ x: number; y: number; t: number } | null>(null);
+
+  useEffect(() => {
+    carregarAcessibilidade().finally(() => setPronto(true));
+  }, []);
+
+  // espera ler as configurações salvas, para o app já abrir com elas aplicadas
+  if (!pronto) return null;
+
+  function aoMudarNavegacao(novoEstado: any) {
+    estadoNav.current = novoEstado;
+    const rota = navRef.getCurrentRoute()?.name;
+    if (rota && rota !== rotaAnterior.current) {
+      rotaAnterior.current = rota;
+      if (leitorTelas) {
+        AccessibilityInfo.announceForAccessibility(NOMES_TELAS[rota] ?? rota);
+      }
+    }
+  }
+
   return (
+    <View
+      style={{ flex: 1 }}
+      onTouchStart={(e) => {
+        const { pageX, pageY } = e.nativeEvent;
+        toqueInicio.current = { x: pageX, y: pageY, t: Date.now() };
+      }}
+      onTouchEnd={(e) => {
+        const inicio = toqueInicio.current;
+        toqueInicio.current = null;
+        if (!feedbackTatil || !inicio) return;
+        const { pageX, pageY } = e.nativeEvent;
+        const moveu = Math.hypot(pageX - inicio.x, pageY - inicio.y) > 12;
+        // só vibra em toques rápidos (não ao rolar a tela)
+        if (!moveu && Date.now() - inicio.t < 400) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        }
+      }}>
     <NavigationIndependentTree>
-      <NavigationContainer>
+      {/* a key recria o app quando fonte/contraste mudam; o initialState mantém a tela atual */}
+      <NavigationContainer
+        key={`${fontStep}-${altoContraste}`}
+        ref={navRef}
+        initialState={estadoNav.current}
+        onStateChange={aoMudarNavegacao}>
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{ headerShown: false }}
@@ -81,5 +169,6 @@ export default function RootLayout() {
         </Stack.Navigator>
       </NavigationContainer>
     </NavigationIndependentTree>
+    </View>
   );
 }

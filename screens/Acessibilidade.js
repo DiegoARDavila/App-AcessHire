@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRef, useState } from 'react';
-import { PanResponder, SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Alert, Linking, PanResponder, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { atualizarAcessibilidade, useAcessibilidade } from '../services/acessibilidade';
 
 const opcoesFonte = ['Pequena', 'Média', 'Grande'];
 const previewSizes = [13, 17, 22];
@@ -14,9 +16,17 @@ export default function DadosUser({ navigation }) {
 
   const styles = createStyles(scale, isSmallDevice, isTablet);
 
-  const [aCativo, setACativo] = useState(false);
-  const [lTativo, setLTativo] = useState(false);
-  const [fontStep, setFontStep] = useState(1);
+  const { fontStep: fontSalvo, altoContraste, leitorTelas, feedbackTatil } = useAcessibilidade();
+  // fontStep é só a prévia enquanto o dedo arrasta; o valor é aplicado ao soltar
+  const [fontStep, setFontStep] = useState(fontSalvo);
+  const fontStepRef = useRef(fontSalvo);
+  const [talkBackAtivo, setTalkBackAtivo] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setTalkBackAtivo);
+    const sub = AccessibilityInfo.addEventListener('screenReaderChanged', setTalkBackAtivo);
+    return () => sub.remove();
+  }, []);
   const trackWidthRef = useRef(0);
   const [trackWidthForRender, setTrackWidthForRender] = useState(0);
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -26,7 +36,31 @@ export default function DadosUser({ navigation }) {
     const currentTrackWidth = trackWidthRef.current;
     if (currentTrackWidth <= 0) return;
     const ratio = Math.min(Math.max(x / currentTrackWidth, 0), 1);
-    setFontStep(Math.round(ratio * totalSteps));
+    const novo = Math.round(ratio * totalSteps);
+    fontStepRef.current = novo;
+    setFontStep(novo);
+  };
+
+  const aplicarFonte = (novo) => atualizarAcessibilidade({ fontStep: novo });
+
+  const abrirConfigSistema = () => {
+    const abrir =
+      Platform.OS === 'android'
+        ? Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS')
+        : Linking.openSettings();
+    Promise.resolve(abrir).catch(() =>
+      Alert.alert('Não foi possível abrir', 'Abra Configurações > Acessibilidade no seu celular.')
+    );
+  };
+
+  const alternarLeitor = (valor) => {
+    atualizarAcessibilidade({ leitorTelas: valor });
+    if (valor) AccessibilityInfo.announceForAccessibility('Leitor de telas ativado');
+  };
+
+  const alternarTatil = (valor) => {
+    atualizarAcessibilidade({ feedbackTatil: valor });
+    if (valor) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
   };
 
   const panResponder = useRef(
@@ -42,8 +76,14 @@ export default function DadosUser({ navigation }) {
       onPanResponderMove: (evt) => {
         updateStepFromX(evt.nativeEvent.locationX);
       },
-      onPanResponderRelease: () => setScrollEnabled(true),
-      onPanResponderTerminate: () => setScrollEnabled(true),
+      onPanResponderRelease: () => {
+        setScrollEnabled(true);
+        aplicarFonte(fontStepRef.current);
+      },
+      onPanResponderTerminate: () => {
+        setScrollEnabled(true);
+        aplicarFonte(fontStepRef.current);
+      },
     })
   ).current;
 
@@ -81,6 +121,18 @@ export default function DadosUser({ navigation }) {
 
           <View
             style={styles.sliderTouchArea}
+            accessible
+            accessibilityRole="adjustable"
+            accessibilityLabel="Tamanho da fonte"
+            accessibilityValue={{ text: opcoesFonte[fontStep] }}
+            accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+            onAccessibilityAction={(e) => {
+              const delta = e.nativeEvent.actionName === 'increment' ? 1 : -1;
+              const novo = Math.min(Math.max(fontStepRef.current + delta, 0), totalSteps);
+              fontStepRef.current = novo;
+              setFontStep(novo);
+              aplicarFonte(novo);
+            }}
             onLayout={(e) => {
               const measuredWidth = e.nativeEvent.layout.width;
               trackWidthRef.current = measuredWidth;
@@ -140,8 +192,9 @@ export default function DadosUser({ navigation }) {
           />
           <Text style={styles.titleFont}>Alto Contraste</Text>
           <Switch
-            value={aCativo}
-            onValueChange={setACativo}
+            accessibilityLabel="Alto contraste"
+            value={altoContraste}
+            onValueChange={(v) => atualizarAcessibilidade({ altoContraste: v })}
             trackColor={{ false: '#d9d9d9', true: '#54c3ea' }}
             thumbColor="#ffffff"
           />
@@ -152,24 +205,43 @@ export default function DadosUser({ navigation }) {
             size={30 * scale}
             color="#45c5f3"
           />
-          <Text style={styles.titleFont}t>Leitor de Telas</Text>
+          <Text style={styles.titleFont}>Leitor de Telas</Text>
           <Switch
-            value={lTativo}
-            onValueChange={setLTativo}
+            accessibilityLabel="Leitor de telas"
+            value={leitorTelas}
+            onValueChange={alternarLeitor}
             trackColor={{ false: '#d9d9d9', true: '#54c3ea' }}
             thumbColor="#ffffff"
           />
         </View>
+        {leitorTelas && (
+          <View style={styles.cardInfo}>
+            <Text style={styles.infoTexto}>
+              O app anuncia em voz alta o nome de cada tela quando você navega. Para ouvir também
+              botões e textos, ative o TalkBack do Android.
+            </Text>
+            <Text style={styles.infoStatus}>
+              TalkBack do sistema: {talkBackAtivo ? 'ativado' : 'desativado'}
+            </Text>
+            <TouchableOpacity
+              style={styles.infoBotao}
+              onPress={abrirConfigSistema}
+              accessibilityRole="button">
+              <Text style={styles.infoBotaoTexto}>Abrir acessibilidade do sistema</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.cardConfig2}>
           <Ionicons
             name="hand-left-outline"
             size={30 * scale}
             color="#45c5f3"
           />
-          <Text style={styles.titleFont}t>Feedback tátil</Text>
+          <Text style={styles.titleFont}>Feedback tátil</Text>
           <Switch
-            value={lTativo}
-            onValueChange={setLTativo}
+            accessibilityLabel="Feedback tátil"
+            value={feedbackTatil}
+            onValueChange={alternarTatil}
             trackColor={{ false: '#d9d9d9', true: '#54c3ea' }}
             thumbColor="#ffffff"
           />
@@ -311,6 +383,35 @@ function createStyles(
       fontWeight: '800',
       color: '#3a3a3a',
       letterSpacing: 1,
+    },
+    cardInfo: {
+      borderWidth: 1,
+      borderColor: '#45c5f3',
+      borderRadius: 14 * scale,
+      padding: 14 * scale,
+      marginBottom: 14 * scale,
+    },
+    infoTexto: {
+      fontSize: 13 * scale,
+      color: '#4a4a4a',
+    },
+    infoStatus: {
+      fontSize: 13 * scale,
+      fontWeight: '700',
+      color: '#3a3a3a',
+      marginTop: 8 * scale,
+    },
+    infoBotao: {
+      backgroundColor: '#45c5f3',
+      borderRadius: 10 * scale,
+      paddingVertical: 10 * scale,
+      alignItems: 'center',
+      marginTop: 10 * scale,
+    },
+    infoBotaoTexto: {
+      color: '#ffffff',
+      fontWeight: '700',
+      fontSize: 13 * scale,
     },
   });
 }
