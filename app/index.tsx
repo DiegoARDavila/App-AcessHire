@@ -46,7 +46,6 @@ import { carregarAcessibilidade, useAcessibilidade } from '../services/acessibil
 
 const Stack = createNativeStackNavigator();
 
-// Nome falado pelo leitor de telas quando a pessoa muda de tela
 const NOMES_TELAS: Record<string, string> = {
   Home: 'Tela inicial',
   LoginUser: 'Login do candidato',
@@ -120,7 +119,6 @@ export default function RootLayout() {
         }
       }}>
     <NavigationIndependentTree>
-      {/* a key recria o app quando fonte/contraste mudam; o initialState mantém a tela atual */}
       <NavigationContainer
         key={`${fontStep}-${altoContraste}`}
         ref={navRef}

@@ -97,7 +97,20 @@ export default function Menu({
             />
           </TouchableOpacity>
         </View>
-
+        <TouchableOpacity
+          style={styles.cardAssistente}
+          onPress={() => navigation.navigate('Assistente')}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir o assistente de carreira com inteligência artificial">
+          <View style={styles.cardAssistenteIcone}>
+            <Ionicons name="sparkles" size={24} color="#ffffff" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.cardAssistenteTitulo}>Assistente AccessHire</Text>
+            <Text style={styles.cardAssistenteSub}>Dicas de emprego e simulação de entrevistas</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={22} color="#45c5f3" />
+        </TouchableOpacity>
         <Text style={styles.sectionTitle}>Sua carreira</Text>
 
         <View style={styles.careerRow}>
@@ -501,5 +514,16 @@ function createStyles(
       marginBottom: 20 * scale,
       paddingVertical: 12 * scale,
     },
+    cardAssistente: {
+      flexDirection: 'row', alignItems: 'center', gap: 12 * scale,
+      borderWidth: 2, borderColor: '#45c5f3', borderRadius: 20,
+      padding: 14 * scale, marginBottom: 20 * scale,
+    },
+    cardAssistenteIcone: {
+      width: 44 * scale, height: 44 * scale, borderRadius: 22 * scale,
+      backgroundColor: '#45c5f3', alignItems: 'center', justifyContent: 'center',
+    },
+    cardAssistenteTitulo: { fontSize: 16 * scale, fontWeight: '800', color: '#3a3a3a' },
+    cardAssistenteSub: { fontSize: 13 * scale, color: '#6f6f6f', marginTop: 2 },
   });
 }

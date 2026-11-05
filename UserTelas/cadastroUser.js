@@ -36,6 +36,7 @@ export default function Login({ navigation }) {
 
     if (!nome || !email || !senha) {
       setError('Preenche nome, email e senha.');
+      console.log('Preencha nome, email e senha.')
       return;
     }
 
@@ -53,16 +54,17 @@ export default function Login({ navigation }) {
       });
 
       setCadastroConcluido(true);
-
-      // dá um instante pra pessoa ler o aviso do laudo antes de seguir pro onboarding
+      console.log('Cadastro concluído!');
       setTimeout(() => {
         navigation.navigate('OnboardingUser', { uid });
       }, 2500);
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('Esse email já está cadastrado.');
+        console.log('Esse email já está cadastrado, tente outro.')
       } else if (e.code === 'auth/weak-password') {
         setError('Senha muito fraca (mínimo 6 caracteres).');
+        console.log('insira uma senha mais longa (mín. 6 caracteres).')
       } else {
         setError('Erro ao cadastrar. Tenta de novo.');
         console.log(e);
