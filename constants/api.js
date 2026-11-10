@@ -1,0 +1,1 @@
+export const URL_ASSISTENTE = 'https://assistenteserve.vercel.app/api/assistente';

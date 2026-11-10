@@ -31,6 +31,7 @@ import Dados from '../screens/Dados';
 import Home from '../screens/Home';
 import Notificacoes from '../screens/Notificacoes';
 import SobreNos from '../screens/SobreNos';
+import Assistente from '../screens/Assistente';
 
 // Telas UserTelas
 import CadastroUser from '../UserTelas/cadastroUser';
@@ -159,6 +160,7 @@ export default function RootLayout() {
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />
           <Stack.Screen name="SobreNos" component={SobreNos} />
           <Stack.Screen name="Notificacoes" component={Notificacoes} />
+          <Stack.Screen name="Assistente" component={Assistente} />
 
           {/* Chat e Conversas */}
           <Stack.Screen name="Chat" component={Chat} />
