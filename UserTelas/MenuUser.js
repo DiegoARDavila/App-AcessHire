@@ -97,20 +97,6 @@ export default function Menu({
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.cardAssistente}
-          onPress={() => navigation.navigate('Assistente')}
-          accessibilityRole="button"
-          accessibilityLabel="Abrir o assistente de carreira com inteligência artificial">
-          <View style={styles.cardAssistenteIcone}>
-            <Ionicons name="sparkles" size={24} color="#ffffff" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cardAssistenteTitulo}>Assistente AccessHire</Text>
-            <Text style={styles.cardAssistenteSub}>Dicas de emprego e simulação de entrevistas</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color="#45c5f3" />
-        </TouchableOpacity>
         <Text style={styles.sectionTitle}>Sua carreira</Text>
 
         <View style={styles.careerRow}>
@@ -165,28 +151,15 @@ export default function Menu({
               )}
             </View>
 
-            <View style={styles.socialCard}>
-              <FontAwesome
-                name="facebook"
-                size={16 * scale}
-                color="#ffffff"
-                style={styles.socialIcon}
-              />
-
-              <FontAwesome
-                name="instagram"
-                size={16 * scale}
-                color="#ffffff"
-                style={styles.socialIcon}
-              />
-
-              <FontAwesome
-                name="twitter"
-                size={16 * scale}
-                color="#ffffff"
-                style={styles.socialIcon}
-              />
-            </View>
+            <TouchableOpacity
+              style={styles.socialCard}
+              onPress={() => navigation.navigate('Assistente')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Abrir a Nexi, assistente com inteligência artificial">
+              <Image source={require('../assets/Nexi.png')} style={{ width: 40 * scale, height: 40 * scale }} resizeMode="contain" />
+              <Text style={styles.socialText}>Nexi</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -470,9 +443,18 @@ function createStyles(
       flex: 1,
       backgroundColor: '#f3c9dd',
       borderRadius: 14 * scale,
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
+      gap: 4 * scale,
+      padding: 8 * scale,
+    },
+
+    socialText: {
+      fontSize: 13 * scale,
+      fontWeight: '800',
+      color: '#3a3a3a',
+      textAlign: 'center',
     },
 
     socialIcon: {
@@ -514,16 +496,5 @@ function createStyles(
       marginBottom: 20 * scale,
       paddingVertical: 12 * scale,
     },
-    cardAssistente: {
-      flexDirection: 'row', alignItems: 'center', gap: 12 * scale,
-      borderWidth: 2, borderColor: '#45c5f3', borderRadius: 20,
-      padding: 14 * scale, marginBottom: 20 * scale,
-    },
-    cardAssistenteIcone: {
-      width: 44 * scale, height: 44 * scale, borderRadius: 22 * scale,
-      backgroundColor: '#45c5f3', alignItems: 'center', justifyContent: 'center',
-    },
-    cardAssistenteTitulo: { fontSize: 16 * scale, fontWeight: '800', color: '#3a3a3a' },
-    cardAssistenteSub: { fontSize: 13 * scale, color: '#6f6f6f', marginTop: 2 },
   });
 }

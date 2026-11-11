@@ -9,8 +9,11 @@ import {
   StatusBar,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { signOut } from '../services/auth';
 
 export default function ConfigUser({ navigation }) {
   const { width } = useWindowDimensions();
@@ -19,6 +22,27 @@ export default function ConfigUser({ navigation }) {
   const scale = Math.min(Math.max(width / 320, 0.85), isTablet ? 1.5 : 1.2);
 
   const styles = createStyles(scale, isSmallDevice, isTablet);
+
+  function handleSair() {
+    Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: async () => {
+          // limpa a navegação primeiro, para as telas logadas desmontarem
+          navigation.dispatch(
+            CommonActions.reset({ index: 0, routes: [{ name: 'Home' }] })
+          );
+          try {
+            await signOut();
+          } catch (e) {
+            console.log('Erro ao sair:', e);
+          }
+        },
+      },
+    ]);
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -82,7 +106,7 @@ export default function ConfigUser({ navigation }) {
           />
           <Text style={styles.configTxt}>Sobre Nós</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.configOpt}>
+        <TouchableOpacity style={styles.configOpt} onPress={handleSair}>
           <Ionicons
             name="log-out-outline"
             size={30 * scale}

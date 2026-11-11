@@ -67,12 +67,10 @@ export default function Chat({ navigation, onSearch }) {
             style={styles.chat}
             onPress={() => navigation.navigate('Assistente')}
             accessibilityRole="button"
-            accessibilityLabel="Conversar com o Assistente AccessHire">
-            <View style={styles.fotoAssistente}>
-              <Ionicons name="sparkles" size={22 * scale} color="#ffffff" />
-            </View>
+            accessibilityLabel="Conversar com a Nexi">
+            <Image source={require('../assets/Nexi.png')} style={styles.fotoAssistente} resizeMode="contain" />
             <View style={{ flex: 1 }}>
-              <Text style={styles.chatText}>Assistente AccessHire</Text>
+              <Text style={styles.chatText}>Nexi</Text>
               <Text style={styles.ultimaMensagem} numberOfLines={1}>
                 Dicas de emprego e simulação de entrevistas
               </Text>
@@ -151,7 +149,6 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
     fotoChat: { width: 44 * scale, height: 44 * scale, borderRadius: 22 * scale },
     fotoAssistente: {
       width: 44 * scale, height: 44 * scale, borderRadius: 22 * scale,
-      backgroundColor: '#45c5f3', alignItems: 'center', justifyContent: 'center',
     },
   });
 }

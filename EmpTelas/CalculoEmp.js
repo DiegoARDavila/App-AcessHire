@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     ScrollView,
@@ -12,14 +12,9 @@ import {
     useWindowDimensions,
     View
 } from 'react-native';
-
-function calcularPercentualExigido(totalFuncionarios) {
-  if (totalFuncionarios < 100) return 0;
-  if (totalFuncionarios <= 200) return 0.02;
-  if (totalFuncionarios <= 500) return 0.03;
-  if (totalFuncionarios <= 1000) return 0.04;
-  return 0.05;
-}
+import GraficoRosca from '../components/GraficoRosca';
+import { auth } from '../services/firebase';
+import { calcularCota, carregarCota, salvarCota } from '../services/cotas';
 
 export default function CalculoEmp({ navigation, onSearch }) {
   const { width } = useWindowDimensions();
@@ -32,36 +27,44 @@ export default function CalculoEmp({ navigation, onSearch }) {
   const [funcionariosPCD, setFuncionariosPCD] = useState('');
   const [resultado, setResultado] = useState(null);
 
-  function handleCalcular() {
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    carregarCota(uid)
+      .then((salvo) => {
+        if (!salvo) return;
+        setTotalFuncionarios(String(salvo.total));
+        setFuncionariosPCD(String(salvo.pcd));
+        const r = calcularCota(salvo.total, salvo.pcd);
+        if (r) setResultado(r);
+      })
+      .catch((e) => console.log('Erro ao carregar cota:', e));
+  }, []);
+
+  async function handleCalcular() {
     const total = parseInt(totalFuncionarios, 10);
     const pcd = parseInt(funcionariosPCD, 10);
 
-    if (isNaN(total) || isNaN(pcd) || total <= 0) {
-      setResultado({ erro: 'Preenche os dois campos com números válidos.' });
+    const r = Number.isNaN(total) || Number.isNaN(pcd) ? null : calcularCota(total, pcd);
+    if (!r) {
+      setResultado({ erro: 'Preencha os dois campos com números válidos.' });
+      return;
+    }
+    if (pcd > total) {
+      setResultado({ erro: 'Os funcionários PCD não podem ser mais que o total.' });
       return;
     }
 
-    const percentualExigido = calcularPercentualExigido(total);
+    setResultado(r);
 
-    if (percentualExigido === 0) {
-      setResultado({
-        isento: true,
-        texto: 'Empresas com menos de 100 funcionários não são obrigadas pela Lei de Cotas.',
-      });
-      return;
+    const uid = auth.currentUser?.uid;
+    if (uid) {
+      try {
+        await salvarCota(uid, total, pcd);
+      } catch (e) {
+        console.log('Erro ao salvar cota:', e);
+      }
     }
-
-    const vagasNecessarias = Math.ceil(total * percentualExigido);
-    const faltam = Math.max(0, vagasNecessarias - pcd);
-    const percentualAtual = ((pcd / total) * 100).toFixed(1);
-
-    setResultado({
-      percentualExigido: (percentualExigido * 100).toFixed(0),
-      percentualAtual,
-      vagasNecessarias,
-      faltam,
-      cumprida: faltam === 0,
-    });
   }
 
   return (
@@ -119,28 +122,33 @@ export default function CalculoEmp({ navigation, onSearch }) {
             <Text style={styles.erroTexto}>{resultado.erro}</Text>
           )}
 
-          {resultado?.isento && (
+          {resultado && !resultado.erro && (
             <View style={styles.resultadoBox}>
-              <Text style={styles.resultadoTexto}>{resultado.texto}</Text>
-            </View>
-          )}
-
-          {resultado && !resultado.erro && !resultado.isento && (
-            <View style={styles.resultadoBox}>
-              <Text style={styles.resultadoTexto}>
-                Percentual exigido por lei: {resultado.percentualExigido}%
-              </Text>
-              <Text style={styles.resultadoTexto}>
-                Percentual atual da empresa: {resultado.percentualAtual}%
-              </Text>
-              {resultado.cumprida ? (
-                <Text style={[styles.resultadoTexto, { color: '#2e7d32', fontWeight: '700', marginTop: 8 }]}>
-                  ✓ Sua empresa está cumprindo a cota legal.
+              <View style={styles.graficoBox}>
+                <GraficoRosca valor={resultado.progresso} tamanho={110 * scale} espessura={14 * scale} />
+              </View>
+              {resultado.isento ? (
+                <Text style={styles.resultadoTexto}>
+                  Empresas com menos de 100 funcionários não são obrigadas pela Lei de Cotas.
                 </Text>
               ) : (
-                <Text style={[styles.resultadoTexto, { color: '#c0392b', fontWeight: '700', marginTop: 8 }]}>
-                  Faltam {resultado.faltam} contratação(ões) PCD para cumprir a cota.
-                </Text>
+                <>
+                  <Text style={styles.resultadoTexto}>
+                    Percentual exigido por lei: {resultado.percentualExigido.toFixed(0)}% ({resultado.necessarias} vagas PCD)
+                  </Text>
+                  <Text style={styles.resultadoTexto}>
+                    Percentual atual da empresa: {resultado.percentualAtual.toFixed(1)}%
+                  </Text>
+                  {resultado.cumprida ? (
+                    <Text style={[styles.resultadoTexto, { color: '#2e7d32', fontWeight: '700', marginTop: 8 }]}>
+                      ✓ Sua empresa está cumprindo a cota legal.
+                    </Text>
+                  ) : (
+                    <Text style={[styles.resultadoTexto, { color: '#c0392b', fontWeight: '700', marginTop: 8 }]}>
+                      Faltam {resultado.faltam} contratação(ões) PCD para cumprir a cota.
+                    </Text>
+                  )}
+                </>
               )}
             </View>
           )}
@@ -148,7 +156,7 @@ export default function CalculoEmp({ navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp')} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp', { companyId: auth.currentUser?.uid })} />
         <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
         <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('VagasEmp')} />
         <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Notificacoes')} />
@@ -195,6 +203,7 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
     resultadoBox: {
       marginTop: 24, padding: 16, borderRadius: 14, borderWidth: 1, borderColor: '#45C5F3', backgroundColor: '#f0fbff',
     },
+    graficoBox: { alignItems: 'center', marginBottom: 12 },
     resultadoTexto: { fontSize: 14, color: '#3a3a3a', marginBottom: 4 },
   });
 }

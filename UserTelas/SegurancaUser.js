@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +11,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { getProfile, getUserRole } from '../services/auth';
+import { auth } from '../services/firebase';
 
 export default function SegurancaUser({ navigation }) {
   const { width } = useWindowDimensions();
@@ -18,6 +21,30 @@ export default function SegurancaUser({ navigation }) {
   const scale = Math.min(Math.max(width / 320, 0.85), isTablet ? 1.5 : 1.2);
 
   const styles = createStyles(scale, isSmallDevice, isTablet);
+
+  // o e-mail vem do login; o telefone, do perfil salvo (candidato ou empresa)
+  const email = auth.currentUser?.email || '';
+  const [telefone, setTelefone] = useState('');
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      setCarregando(false);
+      return;
+    }
+    (async () => {
+      try {
+        const role = await getUserRole(uid);
+        const perfil = role ? await getProfile(uid, role) : null;
+        setTelefone(perfil?.telefone || '');
+      } catch (e) {
+        console.log('Erro ao carregar telefone:', e);
+      } finally {
+        setCarregando(false);
+      }
+    })();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -29,7 +56,7 @@ export default function SegurancaUser({ navigation }) {
           size={22 * scale}
           color="#4a4a4a"
           style={styles.backIcon}
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => navigation.goBack()}
         />
         <View style={styles.topBarContent}>
           <Text style={styles.topBarTitle}>Configurações</Text>
@@ -45,11 +72,15 @@ export default function SegurancaUser({ navigation }) {
         <View style={styles.inputGrid}>
           <View style={styles.inputBox}>
             <Text style={styles.inputTitle}>Endereço de e-mail</Text>
-            <Text style={styles.inputText}>usuario@email.com</Text>
+            <Text style={styles.inputText} selectable>
+              {email || 'Não informado'}
+            </Text>
           </View>
           <View style={styles.inputBox}>
             <Text style={styles.inputTitle}>Número de Telefone</Text>
-            <Text style={styles.inputText}>00 98765-4321</Text>
+            <Text style={styles.inputText} selectable>
+              {carregando ? 'Carregando...' : telefone || 'Não informado'}
+            </Text>
           </View>
         </View>
       </ScrollView>

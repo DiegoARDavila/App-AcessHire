@@ -32,6 +32,8 @@ import Home from '../screens/Home';
 import Notificacoes from '../screens/Notificacoes';
 import SobreNos from '../screens/SobreNos';
 import Assistente from '../screens/Assistente';
+import Planos from '../EmpTelas/Planos';
+import PlanoDetalhe from '../EmpTelas/PlanoDetalhe';
 
 // Telas UserTelas
 import CadastroUser from '../UserTelas/cadastroUser';
@@ -57,6 +59,9 @@ const NOMES_TELAS: Record<string, string> = {
   PerfilUser: 'Seu perfil',
   ConfigUser: 'Configurações',
   SegurancaUser: 'Segurança',
+  SegurancaEmp: 'Segurança',
+  Planos: 'Seu plano',
+  PlanoDetalhe: 'Detalhes do plano',
   LoginEmp: 'Login da empresa',
   CadastroEmp: 'Cadastro da empresa',
   OnboardingEmp: 'Complete o perfil da empresa',
@@ -148,6 +153,7 @@ export default function RootLayout() {
           <Stack.Screen name="CadastroEmp" component={CadastroEmp} />
           <Stack.Screen name="MenuEmp" component={MenuEmp} />
           <Stack.Screen name="ConfigEmp" component={ConfigEmp} />
+          <Stack.Screen name="SegurancaEmp" component={SegurancaUser} />
           <Stack.Screen name="OnboardingEmp" component={OnboardingEmp} />
           <Stack.Screen name="AdicionarVagas" component={AdicionarVagas} />
           <Stack.Screen name="VagasEmp" component={VagasEmp} />
@@ -160,6 +166,8 @@ export default function RootLayout() {
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />
           <Stack.Screen name="SobreNos" component={SobreNos} />
           <Stack.Screen name="Notificacoes" component={Notificacoes} />
+          <Stack.Screen name="Planos" component={Planos} />
+          <Stack.Screen name="PlanoDetalhe" component={PlanoDetalhe} />
           <Stack.Screen name="Assistente" component={Assistente} />
 
           {/* Chat e Conversas */}

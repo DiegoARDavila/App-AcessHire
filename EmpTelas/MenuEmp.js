@@ -17,6 +17,8 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import GraficoRosca from '../components/GraficoRosca';
+import { calcularCota, carregarCota } from '../services/cotas';
 import { listenCompanyJobs } from '../services/jobs';
 
 export default function Menu({ route, navigation, onSearch }) {
@@ -29,6 +31,18 @@ export default function Menu({ route, navigation, onSearch }) {
   const styles = createStyles(scale, isSmallDevice, isTablet, width);
 
   const [vagas, setVagas] = useState([]);
+  const [cota, setCota] = useState(null);
+
+  // recarrega o gráfico sempre que a tela volta a ficar visível (ex.: depois de editar a cota)
+  useEffect(() => {
+    const carregar = () => {
+      carregarCota(companyId)
+        .then((salvo) => setCota(salvo ? calcularCota(salvo.total, salvo.pcd) : null))
+        .catch((e) => console.log('Erro ao carregar cota:', e));
+    };
+    carregar();
+    return navigation.addListener('focus', carregar);
+  }, [companyId, navigation]);
 
   useEffect(() => {
     const unsubscribe = listenCompanyJobs(companyId, setVagas);
@@ -86,20 +100,6 @@ export default function Menu({ route, navigation, onSearch }) {
             ))
           )}
         </View>
-        <TouchableOpacity
-          style={styles.cardAssistente}
-          onPress={() => navigation.navigate('Assistente')}
-          accessibilityRole="button"
-          accessibilityLabel="Abrir o assistente de carreira com inteligência artificial">
-          <View style={styles.cardAssistenteIcone}>
-            <Ionicons name="sparkles" size={24} color="#ffffff" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cardAssistenteTitulo}>Assistente AccessHire</Text>
-            <Text style={styles.cardAssistenteSub}>Dicas de emprego e simulação de entrevistas</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color="#45c5f3" />
-        </TouchableOpacity>
         <Text style={styles.sectionTitle}>Sua carreira</Text>
 
         <View style={styles.careerRow}>
@@ -112,9 +112,21 @@ export default function Menu({ route, navigation, onSearch }) {
 
           <View style={styles.sideCards}>
             <View style={styles.badgeCard}>
+              <View style={styles.graficoBox}>
+                <GraficoRosca valor={cota?.progresso ?? 0} tamanho={78 * scale} espessura={10 * scale} />
+              </View>
+
               <View style={styles.viewCalculo}>
-                <Text style={styles.calculoTexto}>Falta 2% para a conclusão da</Text>
-                <Text style={styles.calculoTexto}>lei de cotas</Text>
+                {!cota ? (
+                  <Text style={styles.calculoTexto}>Informe os dados da lei de cotas</Text>
+                ) : cota.cumprida ? (
+                  <Text style={styles.calculoTexto}>Lei de cotas cumprida</Text>
+                ) : (
+                  <>
+                    <Text style={styles.calculoTexto}>Falta {100 - cota.progresso}% para a conclusão da</Text>
+                    <Text style={styles.calculoTexto}>lei de cotas</Text>
+                  </>
+                )}
               </View>
 
               <View>
@@ -125,6 +137,16 @@ export default function Menu({ route, navigation, onSearch }) {
                 </TouchableOpacity>
               </View>
             </View>
+
+            <TouchableOpacity
+              style={styles.assistenteCard}
+              onPress={() => navigation.navigate('Assistente')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Abrir a Nexi, assistente com inteligência artificial">
+              <Image source={require('../assets/Nexi.png')} style={{ width: 40 * scale, height: 40 * scale }} resizeMode="contain" />
+              <Text style={styles.assistenteTexto}>Nexi</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -227,18 +249,13 @@ function createStyles(scale, isSmallDevice, isTablet, width) {
       borderRadius: 20, alignItems: 'center', justifyContent: 'center',
     },
     textoEditar: { color: '#ffff', fontSize: 18 },
-    calculoTexto: { fontSize: 10, color: '#6D6D6D' },
+    calculoTexto: { fontSize: 10, color: '#6D6D6D', textAlign: 'center' },
+    graficoBox: { alignItems: 'center', marginBottom: 8 * scale },
     viewCalculo: { justifyContent: 'center', alignItems: 'center' },
-    cardAssistente: {
-      flexDirection: 'row', alignItems: 'center', gap: 12 * scale,
-      borderWidth: 2, borderColor: '#45c5f3', borderRadius: 20,
-      padding: 14 * scale, marginBottom: 20 * scale,
+    assistenteCard: {
+      backgroundColor: '#f3c9dd', borderRadius: 14 * scale, paddingVertical: 14 * scale,
+      alignItems: 'center', justifyContent: 'center', gap: 4 * scale,
     },
-    cardAssistenteIcone: {
-      width: 44 * scale, height: 44 * scale, borderRadius: 22 * scale,
-      backgroundColor: '#45c5f3', alignItems: 'center', justifyContent: 'center',
-    },
-    cardAssistenteTitulo: { fontSize: 16 * scale, fontWeight: '800', color: '#3a3a3a' },
-    cardAssistenteSub: { fontSize: 13 * scale, color: '#6f6f6f', marginTop: 2 },
+    assistenteTexto: { fontSize: 13 * scale, fontWeight: '800', color: '#3a3a3a', textAlign: 'center' },
   });
 }

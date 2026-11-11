@@ -22,6 +22,7 @@ export default function OnboardingEmp({ route, navigation }) {
   const [porte, setPorte] = useState('');
   const [anoFundacao, setAnoFundacao] = useState('');
   const [site, setSite] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [descricao, setDescricao] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,7 @@ export default function OnboardingEmp({ route, navigation }) {
         porte,
         anoFundacao: anoFundacao || null,
         site: site || null,
+        telefone: telefone || null,
         descricao: descricao || null,
       });
       navigation.navigate('MenuEmp', { companyId: uid });
@@ -116,6 +118,15 @@ export default function OnboardingEmp({ route, navigation }) {
           value={site}
           onChangeText={setSite}
           autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Telefone (opcional)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="(00) 00000-0000"
+          value={telefone}
+          onChangeText={setTelefone}
+          keyboardType="phone-pad"
         />
 
         <Text style={styles.label}>Descrição (opcional)</Text>

@@ -8,8 +8,13 @@ import {
   useWindowDimensions,
   StatusBar,
   ScrollView,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { signOut } from '../services/auth';
+import { auth } from '../services/firebase';
 
 
 export default function ConfigEmp({ navigation }) {
@@ -21,12 +26,39 @@ export default function ConfigEmp({ navigation }) {
 
   const styles = createStyles(scale, isSmallDevice, isTablet);
 
+  function handleSair() {
+    Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: async () => {
+          // limpa a navegação primeiro, para as telas logadas desmontarem
+          navigation.dispatch(
+            CommonActions.reset({ index: 0, routes: [{ name: 'Home' }] })
+          );
+          try {
+            await signOut();
+          } catch (e) {
+            console.log('Erro ao sair:', e);
+          }
+        },
+      },
+    ]);
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       <View style={styles.topBar}>
-        <Ionicons name="arrow-back" size={22 * scale} color="#4a4a4a" style={styles.backIcon} />
+        <Ionicons
+          name="arrow-back"
+          size={22 * scale}
+          color="#4a4a4a"
+          style={styles.backIcon}
+          onPress={() => navigation.navigate('MenuEmp', { companyId: auth.currentUser?.uid })}
+        />
         <Text style={styles.topBarTitle}>Configurações</Text>
         <View style={styles.backIconSpacer} />
       </View>
@@ -34,36 +66,36 @@ export default function ConfigEmp({ navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-      <View style={styles.configOpt}>
+      <TouchableOpacity style={styles.configOpt} onPress={() => navigation.navigate('SegurancaEmp')}>
         <Ionicons name="lock-closed-outline" size={30 * scale} color="#4a4a4a" style={styles.configIcons}/>
         <Text style={styles.configTxt}>Segurança</Text>
-      </View>
-      <View style={styles.configOpt}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.configOpt} onPress={() => navigation.navigate('Dados')}>
         <Ionicons name="shield-outline" size={30 * scale} color="#4a4a4a" style={styles.configIcons}/>
         <Text  style={styles.configTxt}>Privacidade de Dados</Text>
-      </View>
-      <View style={styles.configOpt}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.configOpt} onPress={() => navigation.navigate('Planos')}>
         <Image source={require('../assets/logo.png')} style={styles.logoOpt}/>
         <Text  style={styles.configTxt}>Sua Assinatura</Text>
-      </View>
-      <View style={styles.configOpt}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.configOpt} onPress={() => navigation.navigate('Acessibilidade')}>
         <Ionicons name="accessibility-outline" size={30 * scale} color="#4a4a4a" style={styles.configIcons}/>
         <Text  style={styles.configTxt}>Acessibilidade</Text>
-      </View>
-      <View style={styles.configOpt}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.configOpt} onPress={() => navigation.navigate('SobreNos')}>
         <Ionicons name="person-outline" size={30 * scale} color="#4a4a4a" style={styles.configIcons}/>
         <Text  style={styles.configTxt}>Sobre Nós</Text>
-      </View>
-      <View style={styles.configOpt}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.configOpt} onPress={handleSair}>
         <Ionicons name="log-out-outline" size={30 * scale} color="#4a4a4a" style={styles.configIcons}/>
         <Text  style={styles.configTxt}>Sair</Text>
-      </View>
+      </TouchableOpacity>
        </ScrollView>
     </SafeAreaView>
   );
 }
 
-function createStyles(scale: number, isSmallDevice: boolean, isTablet: boolean) {
+function createStyles(scale, isSmallDevice, isTablet) {
   return StyleSheet.create({
     safeArea: {
       flex: 1,

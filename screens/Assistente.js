@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  Image,
 } from 'react-native';
 import {
   carregarHistorico,
@@ -123,11 +124,9 @@ export default function Assistente({ navigation }) {
           accessibilityLabel="Voltar">
           <Ionicons name="arrow-back" size={22 * scale} color="#4a4a4a" />
         </TouchableOpacity>
-        <View style={styles.avatar}>
-          <Ionicons name="sparkles" size={22 * scale} color="#ffffff" />
-        </View>
+        <Image source={require('../assets/Nexi.png')} style={styles.avatar} resizeMode="contain" accessibilityLabel="Nexi" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.titulo}>Assistente AccessHire</Text>
+          <Text style={styles.titulo}>Nexi</Text>
           <Text style={styles.subtitulo}>Inteligência artificial</Text>
         </View>
         {mensagens.length > 0 && (
@@ -160,8 +159,8 @@ export default function Assistente({ navigation }) {
                 <View style={styles.balaoAssistente}>
                   <Text style={styles.textoMensagem}>
                     {perfil === 'company'
-                      ? 'Olá! Sou o Assistente AccessHire. Posso ajudar a escrever vagas inclusivas, preparar entrevistas e tornar sua seleção mais acessível. Como posso ajudar?'
-                      : 'Olá! Sou o Assistente AccessHire. Posso dar dicas de emprego, ajudar com seu currículo e simular entrevistas com você. Como posso ajudar?'}
+                      ? 'Olá! Sou a Nexi, a assistente do AccessHire. Posso ajudar a escrever vagas inclusivas, preparar entrevistas e tornar sua seleção mais acessível. Como posso ajudar?'
+                      : 'Olá! Sou a Nexi, a assistente do AccessHire. Posso dar dicas de emprego, ajudar com seu currículo e simular entrevistas com você. Como posso ajudar?'}
                   </Text>
                 </View>
               </View>
@@ -262,9 +261,6 @@ function createStyles(scale, isSmallDevice, isTablet) {
       width: 44 * scale,
       height: 44 * scale,
       borderRadius: 22 * scale,
-      backgroundColor: '#45c5f3',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     titulo: { fontSize: 17 * scale, fontWeight: '800', color: '#3a3a3a' },
     subtitulo: { fontSize: 12 * scale, color: '#6f6f6f' },
