@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { deleteJob, listenCompanyJobs } from '../services/jobs';
 
 export default function VagasEmp({ route, navigation, onSearch }) {
@@ -46,12 +47,7 @@ export default function VagasEmp({ route, navigation, onSearch }) {
             <Image source={require('../assets/UserPhotoEX.png')} style={styles.avatar} />
           </TouchableOpacity>
           <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#9b9b9b"
-              onChangeText={onSearch}
-            />
+            <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
             <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
           </View>
         </View>

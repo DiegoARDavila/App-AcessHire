@@ -12,6 +12,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { auth } from '../services/firebase';
 import { listenUserNotifications } from '../services/notifications';
 
@@ -40,13 +41,7 @@ export default function Notificacoes({ navigation, onSearch }) {
           style={styles.avatar}
         />
         <View style={styles.searchBar}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Pesquisar"
-            placeholderTextColor="#9b9b9b"
-            onChangeText={onSearch}
-            accessibilityLabel="Campo de pesquisa"
-          />
+          <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
           <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
         </View>
       </View>

@@ -15,6 +15,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signUp } from '../services/auth';
+import AceiteTermos from '../components/AceiteTermos';
+import { VERSAO_TERMOS } from '../constants/termos';
 import { formatCNPJ, isValidCNPJ } from '../utils/cnpj';
 
 export default function Login({ navigation }) {
@@ -25,6 +27,7 @@ export default function Login({ navigation }) {
   const [cnpj, setCNPJ] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [aceiteTermos, setAceiteTermos] = useState(false);
 
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -45,6 +48,11 @@ export default function Login({ navigation }) {
       return;
     }
 
+    if (!aceiteTermos) {
+      setError('Para se cadastrar, aceite os Termos de Uso e a Política de Privacidade.');
+      return;
+    }
+
     setLoading(true);
     try {
       const uid = await signUp({
@@ -55,6 +63,7 @@ export default function Login({ navigation }) {
           nomeEmpresa: nome,
           cnpj: cnpj.replace(/\D/g, ''),
           profileCompleted: false,
+          termosVersao: VERSAO_TERMOS,
         },
       });
 
@@ -148,6 +157,20 @@ export default function Login({ navigation }) {
               autoCapitalize="none"
               accessibilityLabel="Campo de senha"
             />
+
+            <AceiteTermos
+              marcado={aceiteTermos}
+              onAlternar={() => setAceiteTermos((v) => !v)}
+              scale={scale}
+              rotulo="Aceitar os Termos de Uso e a Política de Privacidade">
+              <Text>Li e concordo com os{' '}
+              <Text style={{ color: '#1787d5', fontWeight: '700' }} onPress={() => navigation.navigate('Termos', { aba: 'termos' })}>
+                Termos de Uso
+              </Text>{' '}e com a{' '}
+              <Text style={{ color: '#1787d5', fontWeight: '700' }} onPress={() => navigation.navigate('Termos', { aba: 'privacidade' })}>
+                Política de Privacidade
+              </Text>.</Text>
+            </AceiteTermos>
 
             {error ? <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text> : null}
 

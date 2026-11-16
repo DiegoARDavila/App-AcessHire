@@ -17,6 +17,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import GraficoRosca from '../components/GraficoRosca';
 import { calcularCota, carregarCota } from '../services/cotas';
 import { listenCompanyJobs } from '../services/jobs';
@@ -64,13 +65,7 @@ export default function Menu({ route, navigation, onSearch }) {
           </TouchableOpacity>
 
           <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#9b9b9b"
-              onChangeText={onSearch}
-              accessibilityLabel="Campo de pesquisa"
-            />
+            <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
             <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
           </View>
         </View>

@@ -15,6 +15,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signUp } from '../services/auth';
+import AceiteTermos from '../components/AceiteTermos';
+import { VERSAO_TERMOS } from '../constants/termos';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -23,7 +25,10 @@ export default function Login({ navigation }) {
   const [nome, setNome] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [aceiteTermos, setAceiteTermos] = useState(false);
+  const [aceiteSensivel, setAceiteSensivel] = useState(false);
   const [cadastroConcluido, setCadastroConcluido] = useState(false);
+  const [uidCadastrado, setUidCadastrado] = useState(null);
 
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -40,6 +45,11 @@ export default function Login({ navigation }) {
       return;
     }
 
+    if (!aceiteTermos || !aceiteSensivel) {
+      setError('Para se cadastrar, aceite os Termos de Uso, a Política de Privacidade e o tratamento dos dados sobre deficiência.');
+      return;
+    }
+
     setLoading(true);
     try {
       const uid = await signUp({
@@ -50,14 +60,13 @@ export default function Login({ navigation }) {
           nome,
           verificationStatus: 'pending',
           profileCompleted: false,
+          termosVersao: VERSAO_TERMOS,
+          aceiteDadosSensiveis: true,
         },
       });
 
+      setUidCadastrado(uid);
       setCadastroConcluido(true);
-      console.log('Cadastro concluído!');
-      setTimeout(() => {
-        navigation.navigate('OnboardingUser', { uid });
-      }, 2500);
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('Esse email já está cadastrado.');
@@ -77,14 +86,39 @@ export default function Login({ navigation }) {
   if (cadastroConcluido) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.form}>
-          <Text style={styles.subtitleText}>Cadastro realizado!</Text>
-          <Text style={{ textAlign: 'center', marginTop: 20, paddingHorizontal: 20, color: '#4a4a4a' }}>
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 28,
+            paddingVertical: 24,
+          }}>
+          <Text style={styles.subtitleText} accessibilityRole="header">Cadastro realizado!</Text>
+          <Text
+            style={{
+              textAlign: 'center',
+              marginTop: 20,
+              color: '#4a4a4a',
+              fontSize: 15 * scale,
+              lineHeight: 22 * scale,
+            }}>
             Pra liberar sua conta, envie seu laudo médico para{' '}
-            <Text style={{ fontWeight: 'bold' }}>verificacao@accesshire.com</Text>{'\n\n'}
-            Vamos te levar pra completar seu perfil agora...
+            <Text style={{ fontWeight: 'bold' }}>verificacao@accesshire.com</Text>
+            {'\n\n'}
+            Você pode enviar agora ou depois. Quando estiver pronto, toque em Continuar para completar seu perfil.
           </Text>
-        </View>
+
+          <TouchableOpacity
+            style={styles.loginButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('OnboardingUser', { uid: uidCadastrado })}
+            accessibilityRole="button"
+            accessibilityLabel="Continuar para completar o perfil">
+            <Text style={styles.loginButtonText}>Continuar</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -154,6 +188,27 @@ export default function Login({ navigation }) {
               autoCapitalize="none"
               accessibilityLabel="Campo de senha"
             />
+
+            <AceiteTermos
+              marcado={aceiteTermos}
+              onAlternar={() => setAceiteTermos((v) => !v)}
+              scale={scale}
+              rotulo="Aceitar os Termos de Uso e a Política de Privacidade">
+              <Text>Li e concordo com os{' '}
+              <Text style={{ color: '#1787d5', fontWeight: '700' }} onPress={() => navigation.navigate('Termos', { aba: 'termos' })}>
+                Termos de Uso
+              </Text>{' '}e com a{' '}
+              <Text style={{ color: '#1787d5', fontWeight: '700' }} onPress={() => navigation.navigate('Termos', { aba: 'privacidade' })}>
+                Política de Privacidade
+              </Text>.</Text>
+            </AceiteTermos>
+            <AceiteTermos
+              marcado={aceiteSensivel}
+              onAlternar={() => setAceiteSensivel((v) => !v)}
+              scale={scale}
+              rotulo="Autorizar o tratamento dos dados sobre deficiência">
+              <Text>Autorizo o AccessHire a tratar meus dados sobre deficiência e saúde (inclusive o laudo médico) para verificar minha conta e conectar-me a vagas inclusivas. Posso revogar a qualquer momento.</Text>
+            </AceiteTermos>
 
             {error ? <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text> : null}
 

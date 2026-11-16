@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 
 const defaultEntrevistas = [
   { id: '1', data: '10/06', empresa: 'Monster' },
@@ -61,13 +62,7 @@ export default function Menu({
           </TouchableOpacity>
 
           <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#9b9b9b"
-              onChangeText={onSearch}
-              accessibilityLabel="Campo de pesquisa"
-            />
+            <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
 
             <Ionicons
               name="search"

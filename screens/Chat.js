@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { listenUserConversations } from '../services/chat';
 import { auth } from '../services/firebase';
 
@@ -51,13 +52,7 @@ export default function Chat({ navigation, onSearch }) {
             onPress={() => navigation.goBack()}
           />
           <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#9b9b9b"
-              onChangeText={onSearch}
-              accessibilityLabel="Campo de pesquisa"
-            />
+            <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
             <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
           </View>
         </View>

@@ -32,6 +32,9 @@ import Home from '../screens/Home';
 import Notificacoes from '../screens/Notificacoes';
 import SobreNos from '../screens/SobreNos';
 import Assistente from '../screens/Assistente';
+import Busca from '../screens/Busca';
+import PerfilPublico from '../screens/PerfilPublico';
+import Termos from '../screens/Termos';
 import Planos from '../EmpTelas/Planos';
 import PlanoDetalhe from '../EmpTelas/PlanoDetalhe';
 
@@ -60,6 +63,9 @@ const NOMES_TELAS: Record<string, string> = {
   ConfigUser: 'Configurações',
   SegurancaUser: 'Segurança',
   SegurancaEmp: 'Segurança',
+  Busca: 'Pesquisa',
+  PerfilPublico: 'Perfil',
+  Termos: 'Termos de uso e privacidade',
   Planos: 'Seu plano',
   PlanoDetalhe: 'Detalhes do plano',
   LoginEmp: 'Login da empresa',
@@ -166,6 +172,9 @@ export default function RootLayout() {
           <Stack.Screen name="Acessibilidade" component={Acessibilidade} />
           <Stack.Screen name="SobreNos" component={SobreNos} />
           <Stack.Screen name="Notificacoes" component={Notificacoes} />
+          <Stack.Screen name="Busca" component={Busca} />
+          <Stack.Screen name="PerfilPublico" component={PerfilPublico} />
+          <Stack.Screen name="Termos" component={Termos} />
           <Stack.Screen name="Planos" component={Planos} />
           <Stack.Screen name="PlanoDetalhe" component={PlanoDetalhe} />
           <Stack.Screen name="Assistente" component={Assistente} />

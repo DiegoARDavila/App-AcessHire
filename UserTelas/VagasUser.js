@@ -18,6 +18,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { applyToJob } from '../services/applications';
 import { getProfile } from '../services/auth';
 import { auth } from '../services/firebase';
@@ -95,13 +96,7 @@ export default function VagasUser({ navigation, onSearch }) {
             style={styles.avatar}
           />
           <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#9b9b9b"
-              onChangeText={onSearch}
-              accessibilityLabel="Campo de pesquisa"
-            />
+            <BarraPesquisaCampo navigation={navigation} style={styles.searchInput} />
             <Ionicons name="search" size={18 * scale} color="#9b9b9b" />
           </View>
         </View>

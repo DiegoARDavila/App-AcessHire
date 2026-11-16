@@ -25,6 +25,7 @@ export async function signUp({ email, password, role, profileData }) {
   const collectionName = role === 'candidate' ? 'candidates' : 'companies';
   await setDoc(doc(db, collectionName, uid), {
     ...profileData,
+    ...(profileData?.termosVersao ? { termosAceitosEm: serverTimestamp() } : {}),
     createdAt: serverTimestamp(),
   });
 

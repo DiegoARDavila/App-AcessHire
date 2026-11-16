@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
   SafeAreaView,
+  TouchableOpacity,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -53,6 +54,19 @@ export default function DadosUser({ navigation }) {
             prejuízo ao usuário.
           </Text>
         </View>
+
+        <TouchableOpacity
+          style={styles.botaoTermos}
+          onPress={() => navigation.navigate('Termos', { aba: 'termos' })}
+          accessibilityRole="button">
+          <Text style={styles.botaoTermosTexto}>Ver Termos de Uso</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.botaoTermos}
+          onPress={() => navigation.navigate('Termos', { aba: 'privacidade' })}
+          accessibilityRole="button">
+          <Text style={styles.botaoTermosTexto}>Ver Política de Privacidade (LGPD)</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -64,6 +78,15 @@ function createStyles(
   isTablet
 ) {
   return StyleSheet.create({
+    botaoTermos: {
+      borderWidth: 1,
+      borderColor: '#45c5f3',
+      borderRadius: 12 * scale,
+      paddingVertical: 12 * scale,
+      alignItems: 'center',
+      marginTop: 12 * scale,
+    },
+    botaoTermosTexto: { color: '#1787d5', fontWeight: '700', fontSize: 14 * scale },
     safeArea: {
       flex: 1,
       backgroundColor: '#ffffff',
