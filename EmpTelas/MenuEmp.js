@@ -22,8 +22,11 @@ import GraficoRosca from '../components/GraficoRosca';
 import { calcularCota, carregarCota } from '../services/cotas';
 import { listenCompanyJobs } from '../services/jobs';
 
+import { auth } from '../services/firebase';
+
 export default function Menu({ route, navigation, onSearch }) {
-  const { companyId } = route.params;
+  // se a tela for aberta sem parâmetros (ex.: ícone de início), usa a empresa logada
+  const companyId = route?.params?.companyId ?? auth.currentUser?.uid;
   const { width, height } = useWindowDimensions();
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;

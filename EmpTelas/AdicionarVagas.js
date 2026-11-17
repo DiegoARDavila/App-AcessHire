@@ -11,8 +11,11 @@ const RECURSOS_ACESSIBILIDADE = [
   'Trabalho remoto', 'Pausas adicionais', 'Outro',
 ];
 
+import { auth } from '../services/firebase';
+
 export default function AdicionarVagas({ route, navigation }) {
-  const { companyId } = route.params;
+  // se a tela for aberta sem parâmetros (ex.: ícone de início), usa a empresa logada
+  const companyId = route?.params?.companyId ?? auth.currentUser?.uid;
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [localTrabalho, setLocalTrabalho] = useState('');

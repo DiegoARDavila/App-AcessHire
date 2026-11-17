@@ -16,8 +16,11 @@ import {
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { deleteJob, listenCompanyJobs } from '../services/jobs';
 
+import { auth } from '../services/firebase';
+
 export default function VagasEmp({ route, navigation, onSearch }) {
-  const { companyId } = route.params;
+  // se a tela for aberta sem parâmetros (ex.: ícone de início), usa a empresa logada
+  const companyId = route?.params?.companyId ?? auth.currentUser?.uid;
   const { width } = useWindowDimensions();
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -87,7 +90,7 @@ export default function VagasEmp({ route, navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp')} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp', { companyId: auth.currentUser?.uid })} />
         <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
         <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#54c3ea" onPress={() => navigation.navigate('VagasEmp', { companyId })} />
         <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Notificacoes')} />
