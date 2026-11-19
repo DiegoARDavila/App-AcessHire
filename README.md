@@ -1,5 +1,7 @@
-<<<<<<< HEAD
-um App aí
-=======
-# App-AcessHire
->>>>>>> 8ccd69329a900a0141d26b2702b8d249f0b5b72e
+Aplicativo: ACCESSHIRE
+INTEGRANTES:
+Diego André Rantes Davila
+Guilherme Akira Suma
+Guilherme Isaac de Oliveira Almeida
+Guilherme Pereira Maciel
+Gustavo dos Santos Ferreira
