@@ -23,6 +23,7 @@ import { applyToJob } from '../services/applications';
 import { getProfile } from '../services/auth';
 import { auth } from '../services/firebase';
 import { listenOpenJobs } from '../services/jobs';
+import { irParaAba } from '../utils/navegacao';
 
 export default function VagasUser({ navigation, onSearch }) {
   const { width, height } = useWindowDimensions();
@@ -171,13 +172,13 @@ export default function VagasUser({ navigation, onSearch }) {
           name="home"
           size={24 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('MenuUser')}
+          onPress={() => irParaAba(navigation, 'inicio', 'candidate')}
         />
         <Ionicons
           name="chatbubble-outline"
           size={22 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('Chat')}
+          onPress={() => irParaAba(navigation, 'chat', 'candidate')}
         />
         <MaterialCommunityIcons
           name="briefcase-outline"
@@ -188,13 +189,13 @@ export default function VagasUser({ navigation, onSearch }) {
           name="notifications-outline"
           size={23 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('Notificacoes')}
+          onPress={() => irParaAba(navigation, 'notificacoes', 'candidate')}
         />
         <Ionicons
           name="menu"
           size={24 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => irParaAba(navigation, 'menu', 'candidate')}
         />
       </View>
     </SafeAreaView>

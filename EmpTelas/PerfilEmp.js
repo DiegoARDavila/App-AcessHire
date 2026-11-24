@@ -15,6 +15,7 @@ import {
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { getProfile } from '../services/auth';
 import { auth } from '../services/firebase';
+import { irParaAba } from '../utils/navegacao';
 
 export default function PerfilEmp({ navigation, onSearch }) {
   const { width } = useWindowDimensions();
@@ -74,11 +75,11 @@ export default function PerfilEmp({ navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp', { companyId: auth.currentUser?.uid })} />
-        <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
-        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('VagasEmp')} />
-        <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Notificacoes')} />
-        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('ConfigEmp')} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'inicio', 'company')} />
+        <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'chat', 'company')} />
+        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'vagas', 'company')} />
+        <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'notificacoes', 'company')} />
+        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'menu', 'company')} />
       </View>
     </SafeAreaView>
   );

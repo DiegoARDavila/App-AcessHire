@@ -15,6 +15,7 @@ import {
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { auth } from '../services/firebase';
 import { listenUserNotifications } from '../services/notifications';
+import { irParaAba, usePapel } from '../utils/navegacao';
 
 export default function Notificacoes({ navigation, onSearch }) {
   const { width } = useWindowDimensions();
@@ -24,6 +25,7 @@ export default function Notificacoes({ navigation, onSearch }) {
   const styles = createStyles(scale, isSmallDevice, isTablet);
 
   const uid = auth.currentUser?.uid;
+  const papel = usePapel();
   const [notificacoes, setNotificacoes] = useState([]);
 
   useEffect(() => {
@@ -69,11 +71,11 @@ export default function Notificacoes({ navigation, onSearch }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.goBack()} />
-        <Ionicons name="chatbubble" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
-        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('VagasUser')} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'inicio', papel)} />
+        <Ionicons name="chatbubble" size={22 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'chat', papel)} />
+        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'vagas', papel)} />
         <Ionicons name="notifications-outline" size={23 * scale} color="#54c3ea" />
-        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('ConfigUser')} />
+        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'menu', papel)} />
       </View>
     </SafeAreaView>
   );

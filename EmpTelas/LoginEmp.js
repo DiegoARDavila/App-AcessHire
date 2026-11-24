@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signIn, getUserRole, getProfile } from '../services/auth';
+import { resetPara } from '../utils/navegacao';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -50,7 +51,7 @@ export default function Login({ navigation }) {
       const profile = await getProfile(uid, 'company');
 
       if (profile?.profileCompleted) {
-        navigation.navigate('MenuEmp', { companyId: uid });
+        resetPara(navigation, 'MenuEmp', { companyId: uid });
       } else {
         navigation.navigate('OnboardingEmp', { uid });
       }
