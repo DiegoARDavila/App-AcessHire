@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
+import { irParaAba } from '../utils/navegacao';
 
 const defaultEntrevistas = [
   { id: '1', data: '10/06', empresa: 'Monster' },
@@ -180,7 +181,7 @@ export default function Menu({
       <View style={styles.bottomNav}>
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Menu')}
+          onPress={() => irParaAba(navigation, 'inicio', 'candidate')}
         >
           <Ionicons
             name="home"
@@ -191,7 +192,7 @@ export default function Menu({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Chat')}
+          onPress={() => irParaAba(navigation, 'chat', 'candidate')}
         >
           <Ionicons
             name="chatbubble-outline"
@@ -202,7 +203,7 @@ export default function Menu({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('VagasUser')}
+          onPress={() => irParaAba(navigation, 'vagas', 'candidate')}
         >
           <MaterialCommunityIcons
             name="briefcase-outline"
@@ -213,7 +214,7 @@ export default function Menu({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Notificacoes')}
+          onPress={() => irParaAba(navigation, 'notificacoes', 'candidate')}
         >
           <Ionicons
             name="notifications-outline"
@@ -224,7 +225,7 @@ export default function Menu({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('ConfigUser')}
+          onPress={() => irParaAba(navigation, 'menu', 'candidate')}
         >
           <Ionicons
             name="menu"

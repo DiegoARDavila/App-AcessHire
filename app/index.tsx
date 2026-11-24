@@ -84,6 +84,7 @@ const NOMES_TELAS: Record<string, string> = {
   Notificacoes: 'Notificações',
   Chat: 'Conversas',
   Conversas: 'Conversa',
+  Assistente: 'Assistente Nexi',
 };
 
 export default function RootLayout() {

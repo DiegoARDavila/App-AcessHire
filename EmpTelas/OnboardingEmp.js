@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import { completeProfile } from '../services/auth';
+import { resetPara } from '../utils/navegacao';
 
 const SETORES = [
   'Tecnologia', 'Varejo', 'Saúde', 'Indústria', 'Educação',
@@ -54,7 +55,7 @@ export default function OnboardingEmp({ route, navigation }) {
         telefone: telefone || null,
         descricao: descricao || null,
       });
-      navigation.navigate('MenuEmp', { companyId: uid });
+      resetPara(navigation, 'MenuEmp', { companyId: uid });
     } catch (e) {
       setError('Erro ao salvar. Tenta de novo.');
       console.log(e);

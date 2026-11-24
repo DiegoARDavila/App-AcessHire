@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { listenJobApplications } from '../services/applications';
+import { irParaAba } from '../utils/navegacao';
 
 export default function Interessados({ route, navigation }) {
   const { jobId, companyId, vagaTitulo } = route.params;
@@ -73,11 +74,11 @@ export default function Interessados({ route, navigation }) {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('MenuEmp', { companyId })} />
-        <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Chat')} />
-        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#54c3ea" onPress={() => navigation.navigate('VagasEmp', { companyId })} />
-        <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => navigation.navigate('Notificacoes')} />
-        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => navigation.navigate('ConfigEmp')} />
+        <Ionicons name="home" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'inicio', 'company')} />
+        <Ionicons name="chatbubble-outline" size={22 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'chat', 'company')} />
+        <MaterialCommunityIcons name="briefcase-outline" size={23 * scale} color="#54c3ea" onPress={() => irParaAba(navigation, 'vagas', 'company')} />
+        <Ionicons name="notifications-outline" size={23 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'notificacoes', 'company')} />
+        <Ionicons name="menu" size={24 * scale} color="#6f6f6f" onPress={() => irParaAba(navigation, 'menu', 'company')} />
       </View>
     </SafeAreaView>
   );

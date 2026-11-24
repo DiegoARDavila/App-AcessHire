@@ -23,6 +23,7 @@ import { calcularCota, carregarCota } from '../services/cotas';
 import { listenCompanyJobs } from '../services/jobs';
 
 import { auth } from '../services/firebase';
+import { irParaAba } from '../utils/navegacao';
 
 export default function Menu({ route, navigation, onSearch }) {
   // se a tela for aberta sem parâmetros (ex.: ícone de início), usa a empresa logada
@@ -154,31 +155,31 @@ export default function Menu({ route, navigation, onSearch }) {
           name="home"
           size={24 * scale}
           color="#54c3ea"
-          onPress={() => navigation.navigate('MenuEmp', { companyId })}
+          onPress={() => irParaAba(navigation, 'inicio', 'company')}
         />
         <Ionicons
           name="chatbubble-outline"
           size={22 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('Chat')}
+          onPress={() => irParaAba(navigation, 'chat', 'company')}
         />
         <MaterialCommunityIcons
           name="briefcase-outline"
           size={23 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('VagasEmp', { companyId })}
+          onPress={() => irParaAba(navigation, 'vagas', 'company')}
         />
         <Ionicons
           name="notifications-outline"
           size={23 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('Notificacoes')}
+          onPress={() => irParaAba(navigation, 'notificacoes', 'company')}
         />
         <Ionicons
           name="menu"
           size={24 * scale}
           color="#6f6f6f"
-          onPress={() => navigation.navigate('ConfigEmp')}
+          onPress={() => irParaAba(navigation, 'menu', 'company')}
         />
       </View>
     </SafeAreaView>

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { completeProfile } from '../services/auth';
 import { formatDataNascimento, isValidDataNascimento } from '../utils/data';
+import { resetPara } from '../utils/navegacao';
 
 const AREAS = [
   'Tecnologia', 'Administrativo', 'Atendimento ao Cliente', 'Vendas',
@@ -49,7 +50,7 @@ export default function OnboardingUser({ route, navigation }) {
         formacao: formacao || null,
         sobre: sobre || null,
       });
-      navigation.navigate('MenuUser');
+      resetPara(navigation, 'MenuUser');
     } catch (e) {
       setError('Erro ao salvar. Tenta de novo.');
       console.log(e);
