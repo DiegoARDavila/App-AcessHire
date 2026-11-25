@@ -28,8 +28,6 @@ const defaultEntrevistas = [
 export default function Menu({
   navigation,
   entrevistas = defaultEntrevistas,
-  contatos = [],
-  totalContatos,
   onSearch,
 }) {
   const { width } = useWindowDimensions();
@@ -78,6 +76,8 @@ export default function Menu({
             onPress={() => navigation.navigate('VagasUser')}
             style={styles.button}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Procure vagas. Encontre sua vaga ideal."
           >
             <View style={styles.cardTextContainer}>
               <Text style={styles.cardTitle}>Procure vagas</Text>
@@ -90,6 +90,8 @@ export default function Menu({
             <Image
               source={require('../assets/Maleta.png')}
               style={styles.cardImage}
+              resizeMode="contain"
+              accessible={false}
             />
           </TouchableOpacity>
         </View>
@@ -118,35 +120,6 @@ export default function Menu({
           </View>
 
           <View style={styles.sideCards}>
-            <View style={styles.badgeCard}>
-              <View style={styles.badgeDotsRow}>
-                {contatos.slice(0, 4).map((contato) => (
-                  <Image
-                    key={contato.id}
-                    source={{ uri: contato.avatarUri }}
-                    style={styles.contatoAvatar}
-                  />
-                ))}
-
-                {Array.from({
-                  length: Math.max(0, 4 - contatos.length),
-                }).map((_, i) => (
-                  <View
-                    key={`vazio-${i}`}
-                    style={styles.contatoAvatarVazio}
-                  />
-                ))}
-              </View>
-
-              {typeof totalContatos === 'number' && (
-                <View style={styles.badgeCountWrapper}>
-                  <Text style={styles.badgeCountText}>
-                    +{totalContatos}
-                  </Text>
-                </View>
-              )}
-            </View>
-
             <TouchableOpacity
               style={styles.socialCard}
               onPress={() => navigation.navigate('Assistente')}
@@ -245,6 +218,8 @@ function createStyles(
   width
 ) {
   const maxContentWidth = isTablet ? 520 : undefined;
+  // em tablet o conteúdo é limitado a 520px: o card se dimensiona por essa largura, não pela da tela
+  const base = isTablet ? 520 : width;
 
   return StyleSheet.create({
     safeArea: {
@@ -290,48 +265,47 @@ function createStyles(
       color: '#4a4a4a',
     },
 
+    // O card ocupa a largura do conteúdo (antes tinha largura fixa + margem de 30,
+    // o que o fazia passar da tela) e a maleta fica dentro dele, sem posição negativa.
     cardVagas: {
       backgroundColor: '#54c3ea',
-      width: width * 0.9,
-      alignSelf: 'center',
+      alignSelf: 'stretch',
       borderRadius: 25,
-      padding: width * 0.08,
+      padding: base * 0.06,
       flexDirection: 'row',
       alignItems: 'center',
-      margin: 30,
+      marginVertical: 20,
     },
 
     button: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      minHeight: width * 0.28,
+      minHeight: base * 0.28,
     },
 
     cardTextContainer: {
       flex: 1,
+      marginRight: 8,
     },
 
     cardTitle: {
       color: '#fff',
-      fontSize: width * 0.1,
+      fontSize: base * 0.085,
       fontFamily: 'InterBold',
-      width: width * 0.4,
+      fontWeight: '800',
     },
 
     cardSub: {
       color: '#e9f0ff',
-      fontSize: width * 0.05,
+      fontSize: base * 0.05,
       marginTop: 10,
       fontFamily: 'Inter',
     },
 
     cardImage: {
-      width: width * 0.4,
-      height: width * 0.4,
-      position: 'absolute',
-      right: width * -0.1,
-      top: width * -0.17,
+      width: base * 0.3,
+      height: base * 0.3,
     },
 
     sectionTitle: {
@@ -386,53 +360,6 @@ function createStyles(
     sideCards: {
       flex: 1,
       justifyContent: 'space-between',
-    },
-
-    badgeCard: {
-      flex: 1,
-      backgroundColor: '#d9cf9a',
-      borderRadius: 14 * scale,
-      padding: 12 * scale,
-      justifyContent: 'center',
-      marginBottom: 10 * scale,
-      position: 'relative',
-    },
-
-    badgeDotsRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-
-    contatoAvatar: {
-      width: 28 * scale,
-      height: 28 * scale,
-      borderRadius: 14 * scale,
-      borderWidth: 2,
-      borderColor: '#ffffff',
-    },
-
-    contatoAvatarVazio: {
-      width: 28 * scale,
-      height: 28 * scale,
-      borderRadius: 14 * scale,
-      backgroundColor: '#ffffff',
-      opacity: 0.6,
-    },
-
-    badgeCountWrapper: {
-      position: 'absolute',
-      bottom: 8 * scale,
-      right: 8 * scale,
-      backgroundColor: '#8a8a8a',
-      borderRadius: 10 * scale,
-      paddingHorizontal: 6 * scale,
-      paddingVertical: 2 * scale,
-    },
-
-    badgeCountText: {
-      fontSize: 10 * scale,
-      color: '#ffffff',
-      fontWeight: '700',
     },
 
     socialCard: {

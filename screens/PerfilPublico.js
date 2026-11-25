@@ -17,7 +17,7 @@ import {
 import { getProfile } from '../services/auth';
 import { ensureConversation } from '../services/chat';
 import { auth } from '../services/firebase';
-import { listenCompanyJobs } from '../services/jobs';
+import { listenCompanyOpenJobs } from '../services/jobs';
 
 // route.params: { tipo: 'candidate' | 'company', id }
 // Perfil somente leitura. Não mostra telefone, data de nascimento nem dados de saúde/laudo.
@@ -33,6 +33,7 @@ export default function PerfilPublico({ route, navigation }) {
   const [carregando, setCarregando] = useState(true);
   const [abrindo, setAbrindo] = useState(false);
   const [vagas, setVagas] = useState([]);
+  const [carregandoVagas, setCarregandoVagas] = useState(true);
 
   const empresa = tipo === 'company';
 
@@ -45,7 +46,11 @@ export default function PerfilPublico({ route, navigation }) {
 
   useEffect(() => {
     if (!empresa) return;
-    const off = listenCompanyJobs(id, setVagas);
+    setCarregandoVagas(true);
+    const off = listenCompanyOpenJobs(id, (lista) => {
+      setVagas(lista);
+      setCarregandoVagas(false);
+    });
     return () => off();
   }, [empresa, id]);
 
@@ -145,15 +150,35 @@ export default function PerfilPublico({ route, navigation }) {
             </View>
           ) : null}
 
-          {empresa && vagas.length > 0 && (
+          {empresa && (
             <View style={styles.campo}>
               <Text style={styles.rotulo}>Vagas publicadas</Text>
-              {vagas.map((v) => (
-                <Text key={v.id} style={styles.valor}>
-                  {'•'} {v.titulo}
-                  {v.localTrabalho ? ` (${v.localTrabalho})` : ''}
-                </Text>
-              ))}
+              {carregandoVagas ? (
+                <ActivityIndicator style={{ marginTop: 8 }} color="#45c5f3" />
+              ) : vagas.length === 0 ? (
+                <Text style={styles.vagasVazio}>Essa empresa não tem vagas abertas no momento.</Text>
+              ) : (
+                vagas.map((v) => (
+                  <View key={v.id} style={styles.vagaCard}>
+                    <Text style={styles.vagaTitulo}>{v.titulo}</Text>
+                    {v.localTrabalho ? (
+                      <Text style={styles.vagaLocal}>Local: {v.localTrabalho}</Text>
+                    ) : null}
+                    {v.descricao ? (
+                      <Text style={styles.vagaDescricao} numberOfLines={3}>{v.descricao}</Text>
+                    ) : null}
+                    {v.reqAcessibilidade?.length > 0 && (
+                      <View style={styles.chipsRow}>
+                        {v.reqAcessibilidade.map((r) => (
+                          <View key={r} style={styles.chip}>
+                            <Text style={styles.chipText}>{r}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                ))
+              )}
             </View>
           )}
 
@@ -206,6 +231,25 @@ function createStyles(scale, isSmallDevice, isTablet) {
     campo: { marginBottom: 16 * scale },
     rotulo: { fontSize: 12 * scale, fontWeight: '700', color: '#6f6f6f', marginBottom: 2 * scale },
     valor: { fontSize: 15 * scale, color: '#3a3a3a', lineHeight: 21 * scale },
+    vagasVazio: { fontSize: 14 * scale, color: '#6f6f6f', marginTop: 4 * scale },
+    vagaCard: {
+      borderWidth: 1.5,
+      borderColor: '#d9d9d9',
+      borderRadius: 14 * scale,
+      padding: 14 * scale,
+      marginTop: 10 * scale,
+    },
+    vagaTitulo: { fontSize: 16 * scale, fontWeight: '700', color: '#3a3a3a' },
+    vagaLocal: { fontSize: 13 * scale, color: '#6f6f6f', marginTop: 2 * scale },
+    vagaDescricao: { fontSize: 13 * scale, color: '#4a4a4a', marginTop: 8 * scale },
+    chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 * scale, marginTop: 10 * scale },
+    chip: {
+      backgroundColor: '#e8f7fd',
+      borderRadius: 12 * scale,
+      paddingHorizontal: 10 * scale,
+      paddingVertical: 4 * scale,
+    },
+    chipText: { fontSize: 11.5 * scale, color: '#1787d5', fontWeight: '600' },
     botao: {
       flexDirection: 'row',
       gap: 8 * scale,
