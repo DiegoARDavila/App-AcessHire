@@ -2,6 +2,7 @@
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Image,
   SafeAreaView,
   ScrollView,
@@ -13,10 +14,14 @@ import {
   View,
 } from 'react-native';
 import { listenJobApplications } from '../services/applications';
+import { ensureConversation } from '../services/chat';
+import { auth } from '../services/firebase';
+import { obterPerfilBasico } from '../services/perfis';
 import { irParaAba } from '../utils/navegacao';
 
 export default function Interessados({ route, navigation }) {
-  const { jobId, companyId, vagaTitulo } = route.params;
+  const { jobId, vagaTitulo } = route.params;
+  const companyId = route.params.companyId ?? auth.currentUser?.uid;
   const { width } = useWindowDimensions();
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -25,14 +30,61 @@ export default function Interessados({ route, navigation }) {
 
   const [candidatos, setCandidatos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [perfis, setPerfis] = useState({});
+  const [abrindo, setAbrindo] = useState(null);
 
   useEffect(() => {
-  const unsubscribe = listenJobApplications(jobId, companyId, (apps) => {
-    setCandidatos(apps);
-    setLoading(false);
-  });
-  return () => unsubscribe();
-}, [jobId, companyId]);
+    const unsubscribe = listenJobApplications(jobId, companyId, (apps) => {
+      setCandidatos(apps);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [jobId, companyId]);
+
+  // nome e área atualizados direto do perfil do candidato
+  useEffect(() => {
+    let ativo = true;
+    candidatos.forEach((c) => {
+      if (!c.candidateUid) return;
+      obterPerfilBasico(c.candidateUid, 'candidate').then((p) => {
+        if (ativo) setPerfis((atual) => ({ ...atual, [c.candidateUid]: p }));
+      });
+    });
+    return () => {
+      ativo = false;
+    };
+  }, [candidatos]);
+
+  function nomeDe(c) {
+    return perfis[c.candidateUid]?.nome ?? c.candidateNome ?? 'Candidato';
+  }
+
+  function areaDe(c) {
+    return perfis[c.candidateUid]?.detalhe ?? c.candidateAreaAtuacao ?? 'Área não informada';
+  }
+
+  function abrirPerfil(c) {
+    navigation.navigate('PerfilPublico', { tipo: 'candidate', id: c.candidateUid });
+  }
+
+  async function abrirChat(c) {
+    if (!c.candidateUid || !companyId || abrindo) return;
+    setAbrindo(c.candidateUid);
+    try {
+      const conversationId = await ensureConversation(c.candidateUid, companyId);
+      navigation.navigate('Conversas', {
+        conversationId,
+        outroNome: nomeDe(c),
+        outroUid: c.candidateUid,
+        outroTipo: 'candidate',
+      });
+    } catch (e) {
+      console.log('Erro ao abrir conversa:', e);
+      Alert.alert('Ops', 'Não foi possível abrir a conversa agora. Confere a internet e tenta de novo.');
+    } finally {
+      setAbrindo(null);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -53,21 +105,29 @@ export default function Interessados({ route, navigation }) {
           </Text>
         ) : (
           candidatos.map((candidato) => (
-            <TouchableOpacity key={candidato.id} style={styles.candidatoRow}>
+            <TouchableOpacity
+              key={candidato.id}
+              style={styles.candidatoRow}
+              onPress={() => abrirPerfil(candidato)}
+              accessibilityRole="button"
+              accessibilityLabel={`Ver perfil de ${nomeDe(candidato)}`}>
               <Image
                 source={require('../assets/UserPhotoEX.png')}
                 style={styles.avatar}
               />
               <View style={styles.candidatoInfo}>
-                <Text style={styles.candidatoNome}>
-                  {candidato.perfil?.nome || 'Candidato'}
-                </Text>
-                <Text style={styles.candidatoDetalhe}>
-                  {candidato.perfil?.areaAtuacao || 'Área não informada'}
-                </Text>
+                <Text style={styles.candidatoNome}>{nomeDe(candidato)}</Text>
+                <Text style={styles.candidatoDetalhe}>{areaDe(candidato)}</Text>
                 <Text style={styles.compatibilidade}>Compatibilidade: em breve</Text>
               </View>
-              <Feather name="message-circle" size={22} color="#00BCD4" />
+              <TouchableOpacity
+                onPress={() => abrirChat(candidato)}
+                disabled={abrindo === candidato.candidateUid}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessibilityRole="button"
+                accessibilityLabel={`Conversar com ${nomeDe(candidato)}`}>
+                <Feather name="message-circle" size={24} color="#00BCD4" />
+              </TouchableOpacity>
             </TouchableOpacity>
           ))
         )}

@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { completeProfile } from '../services/auth';
-import { formatDataNascimento, isValidDataNascimento } from '../utils/data';
+import { formatDataNascimento } from '../utils/data';
+import { mensagemErro, motivoDataInvalida } from '../utils/erros';
 import { resetPara } from '../utils/navegacao';
 
 const AREAS = [
@@ -32,12 +33,13 @@ export default function OnboardingUser({ route, navigation }) {
   async function handleContinuar() {
     setError('');
 
-    if (!isValidDataNascimento(dataNascimento)) {
-      setError('Data de nascimento inválida.');
+    const motivoData = motivoDataInvalida(dataNascimento);
+    if (motivoData) {
+      setError(motivoData);
       return;
     }
     if (!areaAtuacao) {
-      setError('Escolhe uma área de atuação.');
+      setError('Escolhe uma área de atuação na lista.');
       return;
     }
 
@@ -52,7 +54,7 @@ export default function OnboardingUser({ route, navigation }) {
       });
       resetPara(navigation, 'MenuUser');
     } catch (e) {
-      setError('Erro ao salvar. Tenta de novo.');
+      setError(mensagemErro(e, 'salvar'));
       console.log(e);
     } finally {
       setLoading(false);

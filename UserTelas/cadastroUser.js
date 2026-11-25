@@ -17,6 +17,7 @@ import {
 import { signUp } from '../services/auth';
 import AceiteTermos from '../components/AceiteTermos';
 import { VERSAO_TERMOS } from '../constants/termos';
+import { listaPt, mensagemErro, validarEmail } from '../utils/erros';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -39,21 +40,33 @@ export default function Login({ navigation }) {
   async function handleCadastro() {
     setError('');
 
-    if (!nome || !email || !senha) {
-      setError('Preenche nome, email e senha.');
-      console.log('Preencha nome, email e senha.')
+    const faltando = [!nome.trim() && 'nome', !email.trim() && 'email', !senha && 'senha'].filter(Boolean);
+    if (faltando.length) {
+      setError(`Falta preencher: ${listaPt(faltando)}.`);
+      return;
+    }
+    if (!validarEmail(email)) {
+      setError('Email inválido. Confere se digitou no formato nome@exemplo.com.');
+      return;
+    }
+    if (senha.length < 6) {
+      setError(`A senha precisa ter pelo menos 6 caracteres (você digitou ${senha.length}).`);
       return;
     }
 
-    if (!aceiteTermos || !aceiteSensivel) {
-      setError('Para se cadastrar, aceite os Termos de Uso, a Política de Privacidade e o tratamento dos dados sobre deficiência.');
+    const aceitesFaltando = [
+      !aceiteTermos && 'os Termos de Uso e a Política de Privacidade',
+      !aceiteSensivel && 'o tratamento dos dados sobre deficiência',
+    ].filter(Boolean);
+    if (aceitesFaltando.length) {
+      setError(`Para se cadastrar, aceite ${aceitesFaltando.join(' e ')}.`);
       return;
     }
 
     setLoading(true);
     try {
       const uid = await signUp({
-        email,
+        email: email.trim(),
         password: senha,
         role: 'candidate',
         profileData: {
@@ -68,16 +81,8 @@ export default function Login({ navigation }) {
       setUidCadastrado(uid);
       setCadastroConcluido(true);
     } catch (e) {
-      if (e.code === 'auth/email-already-in-use') {
-        setError('Esse email já está cadastrado.');
-        console.log('Esse email já está cadastrado, tente outro.')
-      } else if (e.code === 'auth/weak-password') {
-        setError('Senha muito fraca (mínimo 6 caracteres).');
-        console.log('insira uma senha mais longa (mín. 6 caracteres).')
-      } else {
-        setError('Erro ao cadastrar. Tenta de novo.');
-        console.log(e);
-      }
+      setError(mensagemErro(e, 'cadastro'));
+      console.log(e);
     } finally {
       setLoading(false);
     }

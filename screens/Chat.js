@@ -17,8 +17,9 @@ import {
   View,
 } from 'react-native';
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
-import { listenUserConversations } from '../services/chat';
+import { listenUserConversations, outroParticipante } from '../services/chat';
 import { auth } from '../services/firebase';
+import { nomePadrao, obterPerfilBasico } from '../services/perfis';
 import { irParaAba, usePapel } from '../utils/navegacao';
 
 export default function Chat({ navigation, onSearch }) {
@@ -32,12 +33,28 @@ export default function Chat({ navigation, onSearch }) {
   const uid = auth.currentUser?.uid;
   const papel = usePapel();
   const [conversas, setConversas] = useState([]);
+  const [nomes, setNomes] = useState({});
 
   useEffect(() => {
     if (!uid) return;
     const unsubscribe = listenUserConversations(uid, setConversas);
     return () => unsubscribe();
   }, [uid]);
+
+  // busca o nome real de quem está do outro lado de cada conversa
+  useEffect(() => {
+    let ativo = true;
+    conversas.forEach((conversa) => {
+      const outro = outroParticipante(conversa, uid);
+      if (!outro.uid) return;
+      obterPerfilBasico(outro.uid, outro.tipo).then((p) => {
+        if (ativo) setNomes((atual) => ({ ...atual, [outro.uid]: p.nome }));
+      });
+    });
+    return () => {
+      ativo = false;
+    };
+  }, [conversas, uid]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -78,30 +95,36 @@ export default function Chat({ navigation, onSearch }) {
               Nenhuma conversa ainda.
             </Text>
           ) : (
-            conversas.map((conversa) => (
-              <TouchableOpacity
-                key={conversa.id}
-                style={styles.chat}
-                onPress={() =>
-                  navigation.navigate('Conversas', {
-                    conversationId: conversa.id,
-                    outroNome: conversa.candidateUid === uid ? 'Empresa' : 'Candidato',
-                  })
-                }>
-                <Image
-                  source={require('../assets/UserPhotoEX.png')}
-                  style={styles.fotoChat}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.chatText}>
-                    {conversa.candidateUid === uid ? 'Empresa' : 'Candidato'}
-                  </Text>
-                  <Text style={styles.ultimaMensagem} numberOfLines={1}>
-                    {conversa.lastMessage || 'Nova conversa'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
+            conversas.map((conversa) => {
+              const outro = outroParticipante(conversa, uid);
+              const nome = nomes[outro.uid] ?? nomePadrao(outro.tipo);
+              return (
+                <TouchableOpacity
+                  key={conversa.id}
+                  style={styles.chat}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Conversa com ${nome}`}
+                  onPress={() =>
+                    navigation.navigate('Conversas', {
+                      conversationId: conversa.id,
+                      outroNome: nome,
+                      outroUid: outro.uid,
+                      outroTipo: outro.tipo,
+                    })
+                  }>
+                  <Image
+                    source={require('../assets/UserPhotoEX.png')}
+                    style={styles.fotoChat}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.chatText}>{nome}</Text>
+                    <Text style={styles.ultimaMensagem} numberOfLines={1}>
+                      {conversa.lastMessage || 'Nova conversa'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
           )}
         </View>
       </ScrollView>
