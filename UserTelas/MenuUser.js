@@ -218,6 +218,8 @@ function createStyles(
   width
 ) {
   const maxContentWidth = isTablet ? 520 : undefined;
+  // em tablet o conteúdo é limitado a 520px: o card se dimensiona por essa largura, não pela da tela
+  const base = isTablet ? 520 : width;
 
   return StyleSheet.create({
     safeArea: {
@@ -269,7 +271,7 @@ function createStyles(
       backgroundColor: '#54c3ea',
       alignSelf: 'stretch',
       borderRadius: 25,
-      padding: width * 0.06,
+      padding: base * 0.06,
       flexDirection: 'row',
       alignItems: 'center',
       marginVertical: 20,
@@ -279,7 +281,7 @@ function createStyles(
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      minHeight: width * 0.28,
+      minHeight: base * 0.28,
     },
 
     cardTextContainer: {
@@ -289,21 +291,21 @@ function createStyles(
 
     cardTitle: {
       color: '#fff',
-      fontSize: width * 0.085,
+      fontSize: base * 0.085,
       fontFamily: 'InterBold',
       fontWeight: '800',
     },
 
     cardSub: {
       color: '#e9f0ff',
-      fontSize: width * 0.05,
+      fontSize: base * 0.05,
       marginTop: 10,
       fontFamily: 'Inter',
     },
 
     cardImage: {
-      width: width * 0.3,
-      height: width * 0.3,
+      width: base * 0.3,
+      height: base * 0.3,
     },
 
     sectionTitle: {
