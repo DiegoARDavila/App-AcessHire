@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signIn, getUserRole, getProfile } from '../services/auth';
+import { listaPt, mensagemErro, validarEmail } from '../utils/erros';
 import { resetPara } from '../utils/navegacao';
 
 export default function Login({ navigation }) {
@@ -33,18 +34,27 @@ export default function Login({ navigation }) {
   async function handleLogin() {
     setError('');
 
-    if (!email || !senha) {
-      setError('Preenche email e senha.');
+    const faltando = [!email.trim() && 'email', !senha && 'senha'].filter(Boolean);
+    if (faltando.length) {
+      setError(`Preenche ${listaPt(faltando)} para entrar.`);
+      return;
+    }
+    if (!validarEmail(email)) {
+      setError('Email inválido. Confere se digitou no formato nome@exemplo.com.');
       return;
     }
 
     setLoading(true);
     try {
-      const uid = await signIn({ email, password: senha });
+      const uid = await signIn({ email: email.trim(), password: senha });
       const role = await getUserRole(uid);
 
+      if (role === 'company') {
+        setError('Esse email é de uma conta de empresa. Usa o login de empresa para entrar.');
+        return;
+      }
       if (role !== 'candidate') {
-        setError('Essa conta não é de candidato. Tenta o login de empresa.');
+        setError('Não encontramos o cadastro de candidato dessa conta. Faz o cadastro ou fala com o suporte.');
         return;
       }
 
@@ -56,12 +66,8 @@ export default function Login({ navigation }) {
         navigation.navigate('OnboardingUser', { uid });
       }
     } catch (e) {
-      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
-        setError('Email ou senha inválidos.');
-      } else {
-        setError('Erro ao entrar. Tenta de novo.');
-        console.log(e);
-      }
+      setError(mensagemErro(e, 'login'));
+      console.log(e);
     } finally {
       setLoading(false);
     }

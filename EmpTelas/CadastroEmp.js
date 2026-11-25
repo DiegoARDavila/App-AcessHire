@@ -17,7 +17,8 @@ import {
 import { signUp } from '../services/auth';
 import AceiteTermos from '../components/AceiteTermos';
 import { VERSAO_TERMOS } from '../constants/termos';
-import { formatCNPJ, isValidCNPJ } from '../utils/cnpj';
+import { formatCNPJ } from '../utils/cnpj';
+import { listaPt, mensagemErro, motivoCNPJInvalido, validarEmail } from '../utils/erros';
 
 export default function Login({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -38,13 +39,28 @@ export default function Login({ navigation }) {
   async function handleCadastro() {
     setError('');
 
-    if (!nome || !email || !senha || !cnpj) {
-      setError('Preenche todos os campos.');
+    const faltando = [
+      !nome.trim() && 'nome da empresa',
+      !cnpj.trim() && 'CNPJ',
+      !email.trim() && 'email',
+      !senha && 'senha',
+    ].filter(Boolean);
+    if (faltando.length) {
+      setError(`Falta preencher: ${listaPt(faltando)}.`);
       return;
     }
 
-    if (!isValidCNPJ(cnpj)) {
-      setError('CNPJ inválido. Confere os números digitados.');
+    const motivoCnpj = motivoCNPJInvalido(cnpj);
+    if (motivoCnpj) {
+      setError(motivoCnpj);
+      return;
+    }
+    if (!validarEmail(email)) {
+      setError('Email inválido. Confere se digitou no formato nome@exemplo.com.');
+      return;
+    }
+    if (senha.length < 6) {
+      setError(`A senha precisa ter pelo menos 6 caracteres (você digitou ${senha.length}).`);
       return;
     }
 
@@ -56,7 +72,7 @@ export default function Login({ navigation }) {
     setLoading(true);
     try {
       const uid = await signUp({
-        email,
+        email: email.trim(),
         password: senha,
         role: 'company',
         profileData: {
@@ -69,14 +85,8 @@ export default function Login({ navigation }) {
 
       navigation.navigate('OnboardingEmp', { uid });
     } catch (e) {
-      if (e.code === 'auth/email-already-in-use') {
-        setError('Esse email já está cadastrado.');
-      } else if (e.code === 'auth/weak-password') {
-        setError('Senha muito fraca (mínimo 6 caracteres).');
-      } else {
-        setError('Erro ao cadastrar. Tenta de novo.');
-        console.log(e);
-      }
+      setError(mensagemErro(e, 'cadastro'));
+      console.log(e);
     } finally {
       setLoading(false);
     }

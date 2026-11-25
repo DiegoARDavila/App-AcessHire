@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import { completeProfile } from '../services/auth';
+import { listaPt, mensagemErro } from '../utils/erros';
 import { resetPara } from '../utils/navegacao';
 
 const SETORES = [
@@ -31,16 +32,13 @@ export default function OnboardingEmp({ route, navigation }) {
   async function handleContinuar() {
     setError('');
 
-    if (!sede) {
-      setError('Preenche a sede/localização da empresa.');
-      return;
-    }
-    if (!setor) {
-      setError('Escolhe o setor de atuação.');
-      return;
-    }
-    if (!porte) {
-      setError('Escolhe o porte da empresa.');
+    const faltando = [
+      !sede.trim() && 'a sede/localização da empresa',
+      !setor && 'o setor de atuação',
+      !porte && 'o porte da empresa',
+    ].filter(Boolean);
+    if (faltando.length) {
+      setError(`Falta escolher ou preencher ${listaPt(faltando)}.`);
       return;
     }
 
@@ -57,7 +55,7 @@ export default function OnboardingEmp({ route, navigation }) {
       });
       resetPara(navigation, 'MenuEmp', { companyId: uid });
     } catch (e) {
-      setError('Erro ao salvar. Tenta de novo.');
+      setError(mensagemErro(e, 'salvar'));
       console.log(e);
     } finally {
       setLoading(false);

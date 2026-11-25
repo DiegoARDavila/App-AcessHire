@@ -35,6 +35,19 @@ export async function ensureConversation(candidateUid, companyId) {
   return conversationId;
 }
 
+// Quem é o outro lado da conversa, do ponto de vista de quem está logado.
+export function outroParticipante(conversa, meuUid) {
+  const souCandidato = conversa?.candidateUid === meuUid;
+  return souCandidato
+    ? { uid: conversa?.companyId ?? null, tipo: 'company' }
+    : { uid: conversa?.candidateUid ?? null, tipo: 'candidate' };
+}
+
+export async function getConversation(conversationId) {
+  const snap = await getDoc(doc(db, 'conversations', conversationId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
 export function listenUserConversations(uid, callback) {
   const q = query(
     collection(db, 'conversations'),

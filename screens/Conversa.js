@@ -9,14 +9,21 @@ import {
     StyleSheet,
     Text,
     TextInput,
+    TouchableOpacity,
     useWindowDimensions,
     View,
 } from 'react-native';
-import { listenConversationMessages, sendMessage } from '../services/chat';
+import {
+  getConversation,
+  listenConversationMessages,
+  outroParticipante,
+  sendMessage,
+} from '../services/chat';
 import { auth } from '../services/firebase';
+import { obterPerfilBasico } from '../services/perfis';
 
 export default function Conversa({ route, navigation }) {
-  const { conversationId, outroNome } = route.params;
+  const { conversationId } = route.params;
   const { width, height } = useWindowDimensions();
   const isSmallDevice = width < 360;
   const isTablet = width >= 768;
@@ -28,10 +35,43 @@ export default function Conversa({ route, navigation }) {
   const [texto, setTexto] = useState('');
   const scrollRef = useRef();
 
+  // quem está do outro lado: usa o que veio da tela anterior e, se faltar, descobre pela conversa
+  const [outro, setOutro] = useState({
+    uid: route.params.outroUid ?? null,
+    tipo: route.params.outroTipo ?? null,
+    nome: route.params.outroNome ?? '',
+  });
+
   useEffect(() => {
     const unsubscribe = listenConversationMessages(conversationId, setMensagens);
     return () => unsubscribe();
   }, [conversationId]);
+
+  useEffect(() => {
+    let ativo = true;
+    async function carregarOutro() {
+      let { uid: outroUid, tipo } = outro;
+      if (!outroUid || !tipo) {
+        const conversa = await getConversation(conversationId).catch(() => null);
+        if (!conversa) return;
+        ({ uid: outroUid, tipo } = outroParticipante(conversa, uid));
+      }
+      if (!outroUid) return;
+      const perfil = await obterPerfilBasico(outroUid, tipo);
+      if (ativo) setOutro({ uid: outroUid, tipo, nome: perfil.nome });
+    }
+    carregarOutro();
+    return () => {
+      ativo = false;
+    };
+    // só roda de novo se trocar de conversa
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, uid]);
+
+  function abrirPerfil() {
+    if (!outro.uid || !outro.tipo) return;
+    navigation.navigate('PerfilPublico', { tipo: outro.tipo, id: outro.uid });
+  }
 
   async function handleEnviar() {
     if (!texto.trim()) return;
@@ -56,10 +96,22 @@ export default function Conversa({ route, navigation }) {
             style={styles.backIcon}
             onPress={() => navigation.goBack()}
           />
-          <View style={styles.userHeader}>
+          <TouchableOpacity
+            style={styles.userHeader}
+            onPress={abrirPerfil}
+            disabled={!outro.uid}
+            accessibilityRole="button"
+            accessibilityLabel={`Ver perfil de ${outro.nome || 'participante'}`}>
             <Image source={require('../assets/UserPhotoEX.png')} style={styles.avatar} />
-            <Text style={{ fontSize: 17 * scale }}>{outroNome}</Text>
-          </View>
+            <View>
+              <Text style={{ fontSize: 17 * scale, color: '#4a4a4a', fontWeight: '700' }}>
+                {outro.nome || (outro.tipo === 'company' ? 'Empresa' : 'Candidato')}
+              </Text>
+              {outro.uid ? (
+                <Text style={{ fontSize: 12 * scale, color: '#00A6C8' }}>Ver perfil</Text>
+              ) : null}
+            </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.content}>

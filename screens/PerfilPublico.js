@@ -57,7 +57,12 @@ export default function PerfilPublico({ route, navigation }) {
       const candidatoUid = empresa ? meuUid : id;
       const empresaId = empresa ? id : meuUid;
       const conversationId = await ensureConversation(candidatoUid, empresaId);
-      navigation.navigate('Conversas', { conversationId, outroNome: nome });
+      navigation.navigate('Conversas', {
+        conversationId,
+        outroNome: nome,
+        outroUid: id,
+        outroTipo: tipo,
+      });
     } catch (e) {
       console.log('Erro ao abrir conversa:', e);
       Alert.alert('Ops', 'Não foi possível abrir a conversa agora. Tente de novo.');
