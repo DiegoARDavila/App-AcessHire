@@ -48,6 +48,33 @@ export function listenCompanyJobs(companyId, callback) {
   );
 }
 
+// Vagas abertas de uma empresa (o que o candidato pode ver no perfil dela).
+// Filtra por status 'open', como listenOpenJobs, para não esbarrar nas regras do Firestore
+// que liberam para candidatos só as vagas abertas.
+export function listenCompanyOpenJobs(companyId, callback) {
+  if (!companyId) {
+    callback([]);
+    return () => {};
+  }
+
+  const q = query(
+    collection(db, 'jobs'),
+    where('companyId', '==', companyId),
+    where('status', '==', 'open')
+  );
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const jobs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(jobs);
+    },
+    (error) => {
+      console.log('Erro no listener de vagas abertas da empresa:', error);
+      callback([]);
+    }
+  );
+}
+
 export function listenOpenJobs(callback) {
   const q = query(collection(db, 'jobs'), where('status', '==', 'open'));
   return onSnapshot(
