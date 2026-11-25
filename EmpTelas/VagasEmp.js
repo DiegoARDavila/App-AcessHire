@@ -38,7 +38,24 @@ export default function VagasEmp({ route, navigation, onSearch }) {
   function handleExcluir(jobId) {
     Alert.alert('Excluir vaga', 'Tem certeza que deseja excluir essa vaga?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: () => deleteJob(jobId) },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            // a lista atualiza sozinha: o listener de vagas remove o item
+            await deleteJob(jobId);
+          } catch (e) {
+            console.log('Erro ao excluir vaga:', e);
+            Alert.alert(
+              'Não foi possível excluir',
+              e?.code === 'firestore/permission-denied'
+                ? 'Sem permissão para excluir essa vaga. Fala com o suporte.'
+                : 'Confere a internet e tenta de novo.'
+            );
+          }
+        },
+      },
     ]);
   }
 

@@ -22,6 +22,11 @@ export function createJob({ companyId, titulo, descricao, localTrabalho, reqAces
   });
 }
 
+export function deleteJob(jobId) {
+  if (!jobId) return Promise.reject(new Error('deleteJob chamado sem jobId'));
+  return deleteDoc(doc(db, 'jobs', jobId));
+}
+
 export function listenCompanyJobs(companyId, callback) {
   if (!companyId) {
     console.log('listenCompanyJobs chamado sem companyId');
