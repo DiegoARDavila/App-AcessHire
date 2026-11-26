@@ -19,15 +19,8 @@ import {
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { irParaAba } from '../utils/navegacao';
 
-const defaultEntrevistas = [
-  { id: '1', data: '10/06', empresa: 'Monster' },
-  { id: '2', data: '25/06', empresa: 'Sony' },
-  { id: '3', data: '18/07', empresa: 'Google' },
-];
-
 export default function Menu({
   navigation,
-  entrevistas = defaultEntrevistas,
   onSearch,
 }) {
   const { width } = useWindowDimensions();
@@ -111,21 +104,6 @@ export default function Menu({
             <Text style={styles.entrevistasHeader}>
               Entrevistas
             </Text>
-
-            {entrevistas.map((item, index) => (
-              <View
-                key={item.id}
-                style={[
-                  styles.entrevistaRow,
-                  index === entrevistas.length - 1 &&
-                  styles.entrevistaRowLast,
-                ]}
-              >
-                <Text style={styles.entrevistaText}>
-                  {item.data} - {item.empresa}
-                </Text>
-              </View>
-            ))}
           </View>
 
           <View style={styles.sideCards}>
@@ -145,18 +123,6 @@ export default function Menu({
           <Text style={styles.vagaInteresseTitle}>
             Vagas de interesse
           </Text>
-
-          <View style={styles.vagaInteresseRow}>
-            <Text style={styles.vagaInteresseSubtitle}>
-              Microsoft
-            </Text>
-
-            <Ionicons
-              name="information-circle-outline"
-              size={18 * scale}
-              color="#ffffff"
-            />
-          </View>
         </View>
       </ScrollView>
 
@@ -362,23 +328,6 @@ function createStyles(
       textAlign: 'center',
     },
 
-    entrevistaRow: {
-      paddingVertical: 12 * scale,
-      paddingHorizontal: 12 * scale,
-      borderBottomWidth: 1,
-      borderBottomColor: '#d9d9d9',
-    },
-
-    entrevistaRowLast: {
-      borderBottomWidth: 0,
-    },
-
-    entrevistaText: {
-      fontSize: 12.5 * scale,
-      color: '#4a4a4a',
-      textAlign: 'center',
-    },
-
     sideCards: {
       flex: 1,
       justifyContent: 'space-between',
@@ -416,19 +365,6 @@ function createStyles(
       fontSize: 17 * scale,
       fontWeight: '800',
       color: '#ffffff',
-      marginBottom: 8 * scale,
-    },
-
-    vagaInteresseRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-
-    vagaInteresseSubtitle: {
-      fontSize: 14 * scale,
-      color: '#ffffff',
-      fontWeight: '600',
-      marginRight: 6 * scale,
     },
 
     bottomNav: {
