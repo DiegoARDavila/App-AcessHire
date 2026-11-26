@@ -19,15 +19,8 @@ import {
 import BarraPesquisaCampo from '../components/BarraPesquisaCampo';
 import { irParaAba } from '../utils/navegacao';
 
-const defaultEntrevistas = [
-  { id: '1', data: '10/06', empresa: 'Monster' },
-  { id: '2', data: '25/06', empresa: 'Sony' },
-  { id: '3', data: '18/07', empresa: 'Google' },
-];
-
 export default function Menu({
   navigation,
-  entrevistas = defaultEntrevistas,
   onSearch,
 }) {
   const { width } = useWindowDimensions();
@@ -71,27 +64,36 @@ export default function Menu({
           </View>
         </View>
 
-        <View style={styles.cardVagas}>
+        <View style={styles.cardWrap}>
+          <View style={styles.cardVagas}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('VagasUser')}
+              style={styles.button}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Procure vagas. Encontre sua vaga ideal."
+            >
+              <View style={styles.cardTextContainer}>
+                <Text style={styles.cardTitle}>Procure vagas</Text>
+
+                <Text style={styles.cardSub}>
+                  Encontre sua vaga ideal.
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* A maleta fica por cima do canto do card, dentro da área do cardWrap */}
           <TouchableOpacity
             onPress={() => navigation.navigate('VagasUser')}
-            style={styles.button}
+            style={styles.maletaBtn}
             activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Procure vagas. Encontre sua vaga ideal."
+            accessible={false}
           >
-            <View style={styles.cardTextContainer}>
-              <Text style={styles.cardTitle}>Procure vagas</Text>
-
-              <Text style={styles.cardSub}>
-                Encontre sua vaga ideal.
-              </Text>
-            </View>
-
             <Image
               source={require('../assets/Maleta.png')}
               style={styles.cardImage}
               resizeMode="contain"
-              accessible={false}
             />
           </TouchableOpacity>
         </View>
@@ -102,21 +104,6 @@ export default function Menu({
             <Text style={styles.entrevistasHeader}>
               Entrevistas
             </Text>
-
-            {entrevistas.map((item, index) => (
-              <View
-                key={item.id}
-                style={[
-                  styles.entrevistaRow,
-                  index === entrevistas.length - 1 &&
-                  styles.entrevistaRowLast,
-                ]}
-              >
-                <Text style={styles.entrevistaText}>
-                  {item.data} - {item.empresa}
-                </Text>
-              </View>
-            ))}
           </View>
 
           <View style={styles.sideCards}>
@@ -136,18 +123,6 @@ export default function Menu({
           <Text style={styles.vagaInteresseTitle}>
             Vagas de interesse
           </Text>
-
-          <View style={styles.vagaInteresseRow}>
-            <Text style={styles.vagaInteresseSubtitle}>
-              Microsoft
-            </Text>
-
-            <Ionicons
-              name="information-circle-outline"
-              size={18 * scale}
-              color="#ffffff"
-            />
-          </View>
         </View>
       </ScrollView>
 
@@ -220,6 +195,7 @@ function createStyles(
   const maxContentWidth = isTablet ? 520 : undefined;
   // em tablet o conteúdo é limitado a 520px: o card se dimensiona por essa largura, não pela da tela
   const base = isTablet ? 520 : width;
+  const maleta = base * 0.36; // tamanho da maleta do card "Procure vagas"
 
   return StyleSheet.create({
     safeArea: {
@@ -265,35 +241,39 @@ function createStyles(
       color: '#4a4a4a',
     },
 
-    // O card ocupa a largura do conteúdo (antes tinha largura fixa + margem de 30,
-    // o que o fazia passar da tela) e a maleta fica dentro dele, sem posição negativa.
+    // Card "Procure vagas": a maleta "salta" para fora do canto superior direito do card.
+    // Para ela não ser cortada nem sumir, o cardWrap reserva o espaço dela (paddingTop e
+    // margem direita negativa) e a maleta fica dentro dessa área, sobre o card.
+    cardWrap: {
+      alignSelf: 'stretch',
+      marginTop: 20,
+      marginBottom: 20,
+      marginRight: -(maleta * 0.07),
+      paddingTop: maleta * 0.26,
+    },
+
     cardVagas: {
       backgroundColor: '#54c3ea',
-      alignSelf: 'stretch',
       borderRadius: 25,
       padding: base * 0.06,
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical: 20,
+      marginRight: maleta * 0.07,
     },
 
     button: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
       minHeight: base * 0.28,
     },
 
     cardTextContainer: {
       flex: 1,
-      marginRight: 8,
     },
 
     cardTitle: {
       color: '#fff',
-      fontSize: base * 0.085,
+      fontSize: base * 0.095,
       fontFamily: 'InterBold',
       fontWeight: '800',
+      // não deixa o título passar por baixo da maleta
+      marginRight: maleta * 0.62,
     },
 
     cardSub: {
@@ -303,9 +283,17 @@ function createStyles(
       fontFamily: 'Inter',
     },
 
+    maletaBtn: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      width: maleta,
+      height: maleta,
+    },
+
     cardImage: {
-      width: base * 0.3,
-      height: base * 0.3,
+      width: maleta,
+      height: maleta,
     },
 
     sectionTitle: {
@@ -337,23 +325,6 @@ function createStyles(
       paddingHorizontal: 12 * scale,
       borderBottomWidth: 1,
       borderBottomColor: '#3a3a3a',
-      textAlign: 'center',
-    },
-
-    entrevistaRow: {
-      paddingVertical: 12 * scale,
-      paddingHorizontal: 12 * scale,
-      borderBottomWidth: 1,
-      borderBottomColor: '#d9d9d9',
-    },
-
-    entrevistaRowLast: {
-      borderBottomWidth: 0,
-    },
-
-    entrevistaText: {
-      fontSize: 12.5 * scale,
-      color: '#4a4a4a',
       textAlign: 'center',
     },
 
@@ -394,19 +365,6 @@ function createStyles(
       fontSize: 17 * scale,
       fontWeight: '800',
       color: '#ffffff',
-      marginBottom: 8 * scale,
-    },
-
-    vagaInteresseRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-
-    vagaInteresseSubtitle: {
-      fontSize: 14 * scale,
-      color: '#ffffff',
-      fontWeight: '600',
-      marginRight: 6 * scale,
     },
 
     bottomNav: {
